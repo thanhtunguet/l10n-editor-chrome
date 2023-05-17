@@ -42,5 +42,9 @@ export const editorSlice = createSlice({
       state.resources = {};
       state.supportedLocales = [];
     },
+    deleteKey(state, action: PayloadAction<string>) {
+      const key = action.payload;
+      delete state.resources[key];
+    },
   },
 });

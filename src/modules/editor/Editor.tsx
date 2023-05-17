@@ -7,6 +7,7 @@ import Button from 'antd/lib/button';
 import {
   CloseOutlined,
   CodepenOutlined,
+  DeleteOutlined,
   DownloadOutlined,
   ExportOutlined,
   ImportOutlined,
@@ -17,48 +18,10 @@ import type {GlobalState} from 'src/store/GlobalState';
 import {editorSlice} from 'src/store/slices/editor-slice';
 import * as XLSX from 'xlsx';
 import './Editor.scss';
-import type {LocalizationMap} from 'src/types/Localization';
 import CodeModal from 'src/components/organisms/CodeModal';
 import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
-
-function exportToLocalizationsExcel(localizations: LocalizationMap): void {
-  const workbook = XLSX.utils.book_new();
-  const json = Object.values(localizations).map((record) => {
-    return Object.fromEntries(
-      Object.entries(record).map(([k, v]) => {
-        return [k, v];
-      }),
-    );
-  });
-  const worksheet = XLSX.utils.json_to_sheet(json);
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'data');
-
-  const excelBuffer = XLSX.write(workbook, {bookType: 'xlsx', type: 'buffer'});
-  const fileName = 'localizations.xlsx';
-
-  saveAsExcelBuffer(excelBuffer, fileName);
-}
-
-function saveAsExcelBuffer(buffer: ArrayBuffer, fileName: string): void {
-  const data = new Blob([buffer], {
-    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  });
-
-  // For other browsers
-  const downloadLink = document.createElement('a');
-  const url = window.URL.createObjectURL(data);
-
-  downloadLink.href = url;
-  downloadLink.download = fileName;
-
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-
-  setTimeout(() => {
-    document.body.removeChild(downloadLink);
-    window.URL.revokeObjectURL(url);
-  }, 0);
-}
+import {exportToLocalizationsExcel} from 'src/helpers/excel';
+import {edit} from 'ace-builds';
 
 const Editor: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
@@ -111,31 +74,53 @@ const Editor: FC = () => {
     if (Object.keys(localizationData).length === 0) {
       return [];
     }
-    return Object.keys(Object.values(localizationData)[0]).map((key) => ({
-      dataIndex: key,
-      key: key,
-      title: key,
-      render: (value, record) => {
-        if (key !== 'key') {
+    return [
+      ...Object.keys(Object.values(localizationData)[0]).map((key) => ({
+        dataIndex: key,
+        key: key,
+        title: key,
+        render: (value, record) => {
+          if (key !== 'key') {
+            return (
+              <Input
+                value={value}
+                disabled={value === key}
+                onChange={(event) => {
+                  dispatch(
+                    editorSlice.actions.setNewKey({
+                      language: key,
+                      key: record.key,
+                      value: event.target.value,
+                    }),
+                  );
+                }}
+              />
+            );
+          }
+          return value;
+        },
+      })),
+      {
+        dataIndex: 'key',
+        key: 'actions',
+        title: 'Actions',
+        width: 120,
+        className: 'd-flex justify-content-center align-items-center',
+        render: (key) => {
           return (
-            <Input
-              value={value}
-              disabled={value === key}
-              onChange={(event) => {
-                dispatch(
-                  editorSlice.actions.setNewKey({
-                    language: key,
-                    key: record.key,
-                    value: event.target.value,
-                  }),
-                );
+            <Button
+              type="link"
+              icon={<DeleteOutlined className="text-danger" />}
+              onClick={() => {
+                if (key !== '@@locale') {
+                  dispatch(editorSlice.actions.deleteKey(key));
+                }
               }}
             />
           );
-        }
-        return value;
+        },
       },
-    }));
+    ];
   }, [dispatch, localizationData]);
 
   const localizations = React.useMemo(

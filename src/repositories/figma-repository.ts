@@ -14,6 +14,8 @@ export class FigmaRepository {
     });
     const getFileResult = await api.getFile(fileKey);
     const {document} = getFileResult;
+    const components = await api.getTeamComponents('1047428911490061155');
+    console.log(components);
     const textNodes: Figma.Node[] = [];
     this.fetchAllNodes(document, textNodes);
     return textNodes;
