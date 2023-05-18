@@ -10,18 +10,17 @@ import {
   DeleteOutlined,
   DownloadOutlined,
   ExportOutlined,
-  ImportOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
 import {useDispatch, useSelector} from 'react-redux';
 import type {GlobalState} from 'src/store/GlobalState';
 import {editorSlice} from 'src/store/slices/editor-slice';
-import * as XLSX from 'xlsx';
 import './Editor.scss';
 import CodeModal from 'src/components/organisms/CodeModal';
 import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
 import {exportToLocalizationsExcel} from 'src/helpers/excel';
-import {edit} from 'ace-builds';
+import ImportButton from 'src/components/organisms/ImportButton';
+import Affix from 'antd/lib/affix';
 
 const Editor: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
@@ -132,61 +131,25 @@ const Editor: FC = () => {
     exportToLocalizationsExcel(localizationData);
   }, [localizationData]);
 
-  const handleImportExcel = React.useCallback(
-    async (event) => {
-      function readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              const base64String = reader.result.split(',')[1];
-              resolve(base64String);
-              return;
-            }
-            reject();
-          };
-
-          reader.onerror = () => {
-            reject(new Error('Failed to read the file'));
-          };
-
-          reader.readAsDataURL(file);
-        });
-      }
-
-      if (event.target.files.length > 0) {
-        const file = event.target.files[0];
-        const base64 = await readFileAsBase64(file);
-        const workbook = XLSX.read(base64, {type: 'base64'});
-        const json = XLSX.utils.sheet_to_json(
-          Object.values(workbook.Sheets)[0],
-        );
-        const supportedLocales = Object.keys(json[0]).filter(
-          (key) => key !== 'key',
-        );
-        const resources = Object.fromEntries(
-          json.map((record: any) => [record.key, record]),
-        );
-        dispatch(
-          editorSlice.actions.loadEditor({
-            supportedLocales,
-            resources,
-          }),
-        );
-      }
-    },
-    [dispatch],
-  );
-
   if (columns.length === 0) {
     return (
-      <div className="p-4">
+      <div className="p-4 d-flex align-items-center">
+        <ImportButton>Import Excel</ImportButton>
+
+        <Button
+          type="primary"
+          className="mx-2"
+          onClick={() => {
+            document.getElementById('import-files').click();
+          }}>
+          Import files
+        </Button>
         <input
+          id="import-files"
           type="file"
           // @ts-ignore
           webkitdirectory="webkitdirectory"
-          className="btn btn-default"
+          className="hide"
           multiple={true}
           onChange={(event) => {
             setFiles(event.target.files);
@@ -198,61 +161,48 @@ const Editor: FC = () => {
 
   return (
     <>
-      <div className="d-flex my-2">
-        <Button
-          type="default"
-          className="d-flex align-items-center mr-2"
-          icon={<CloseOutlined />}
-          onClick={() => {
-            dispatch(editorSlice.actions.cancelEditor());
-          }}>
-          Close editor
-        </Button>
-
-        <div className="d-inline-flex flex-grow-1 justify-content-end">
-          <a
-            role="button"
-            href="../../assets/l10n-template.xlsx"
-            className="ant-btn ant-btn-primary d-flex align-items-center ml-2">
-            <DownloadOutlined />
-            <span className="ml-2">Download template</span>
-          </a>
-
-          <NewKeyFormModal icon={<PlusOutlined />}>Add key</NewKeyFormModal>
-
+      <Affix offsetTop={10}>
+        <div className="d-flex py-2 bg-white">
           <Button
-            type="primary"
-            className="d-flex align-items-center ml-2"
-            icon={<ImportOutlined />}
+            type="default"
+            className="d-flex align-items-center mr-2"
+            icon={<CloseOutlined />}
             onClick={() => {
-              document.getElementById('import-excel').click();
+              dispatch(editorSlice.actions.cancelEditor());
             }}>
-            Import
+            Close editor
           </Button>
 
-          <input
-            type="file"
-            id="import-excel"
-            onChange={handleImportExcel}
-            className="hide"
-          />
+          <div className="d-inline-flex flex-grow-1 justify-content-end">
+            <a
+              role="button"
+              href="../../../src/assets/l10n-template.xlsx"
+              className="ant-btn ant-btn-primary d-flex align-items-center ml-2">
+              <DownloadOutlined />
+              <span className="ml-2">Download template</span>
+            </a>
 
-          <Button
-            type="primary"
-            className="d-flex align-items-center ml-2"
-            icon={<ExportOutlined />}
-            onClick={handleExportExcel}>
-            Export
-          </Button>
+            <NewKeyFormModal icon={<PlusOutlined />}>Add key</NewKeyFormModal>
 
-          <CodeModal
-            label="Code"
-            locales={locales}
-            localization={localizationData}
-            icon={<CodepenOutlined />}
-          />
+            <ImportButton />
+
+            <Button
+              type="primary"
+              className="d-flex align-items-center ml-2"
+              icon={<ExportOutlined />}
+              onClick={handleExportExcel}>
+              Export
+            </Button>
+
+            <CodeModal
+              label="Code"
+              locales={locales}
+              localization={localizationData}
+              icon={<CodepenOutlined />}
+            />
+          </div>
         </div>
-      </div>
+      </Affix>
 
       <Table columns={columns} dataSource={localizations} pagination={false} />
     </>

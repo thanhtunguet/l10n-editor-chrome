@@ -3,7 +3,7 @@ import type {PropsWithChildren, ReactElement} from 'react';
 import Modal from 'antd/lib/modal/Modal';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
-import type {ButtonProps} from 'antd';
+import type {ButtonProps} from 'antd/lib/button';
 import {PlusOutlined} from '@ant-design/icons';
 import Button from 'antd/lib/button';
 import {editorSlice} from 'src/store/slices/editor-slice';
