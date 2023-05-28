@@ -6,6 +6,21 @@ import Modal from 'antd/lib/modal/Modal';
 import type {LocalizationMap} from 'src/types/Localization';
 import Button from 'antd/lib/button';
 
+function downloadFile(filename: string, content: string): void {
+  const blob = new Blob([content], {type: 'text/plain'});
+
+  const anchorElement = document.createElement('a');
+  anchorElement.href = URL.createObjectURL(blob);
+  anchorElement.download = filename;
+  anchorElement.style.display = 'none';
+
+  document.body.appendChild(anchorElement);
+  anchorElement.click();
+
+  document.body.removeChild(anchorElement);
+  URL.revokeObjectURL(anchorElement.href);
+}
+
 export function CodeModal(
   props: PropsWithChildren<CodeModalProps>,
 ): ReactElement {
@@ -45,16 +60,38 @@ export function CodeModal(
                   value[locale],
                 ]),
               );
+
+              const content = JSON.stringify(result, null, 2);
+
               return (
-                <div
-                  key={locale}
-                  className="d-flex flex-column justify-content-center">
+                <div key={locale} className="d-flex flex-column">
                   <Typography.Title level={2}>{locale}</Typography.Title>
+
+                  <div>
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        downloadFile(`${locale}.json`, content);
+                      }}>
+                      Download
+                      <code>{` ${locale}.json`}</code>
+                    </Button>
+
+                    <Button
+                      type="link"
+                      onClick={() => {
+                        downloadFile(`intl_${locale}.arb`, content);
+                      }}>
+                      Download
+                      <code>{` intl_${locale}.arb`}</code>
+                    </Button>
+                  </div>
+
                   <AceEditor
                     mode="json"
                     theme="monokai"
                     editorProps={{$blockScrolling: true}}
-                    value={JSON.stringify(result, null, 2)}
+                    value={content}
                   />
                 </div>
               );
