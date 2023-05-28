@@ -1,6 +1,7 @@
 import * as Figma from 'figma-api';
+import {Repository} from 'react3l';
 
-export class FigmaRepository {
+export class FigmaRepository extends Repository {
   async getFigmaApiKey(): Promise<string> {
     const {figmaApiKey} = await chrome.storage.sync.get('figmaApiKey');
     return figmaApiKey;

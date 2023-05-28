@@ -15,6 +15,7 @@ import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
 import type {DevopsServer} from 'src/models/devops-server';
 import {devopsSlice} from 'src/store/slices/devops-slice';
+import DevopsConnectModal from 'src/components/organisms/DevopsConnectModal';
 
 const {Column} = Table;
 
@@ -81,7 +82,7 @@ const DevopsServers: FC = () => {
         </Button>
       </div>
 
-      <Table dataSource={servers} showHeader={true}>
+      <Table dataSource={servers} showHeader={true} rowKey="id">
         <Column key="ID" title="ID" dataIndex="id" />
         <Column key="Name" title="Name" dataIndex="name" />
         <Column
@@ -102,7 +103,7 @@ const DevopsServers: FC = () => {
           dataIndex="id"
           render={(value, record: DevopsServer, _index) => {
             return (
-              <>
+              <React.Fragment key={value}>
                 <Button
                   type="link"
                   className="d-inline-flex align-items-center mx-2"
@@ -120,7 +121,9 @@ const DevopsServers: FC = () => {
                   onClick={() => handleConfirmDeleteServer(record)}>
                   Delete
                 </Button>
-              </>
+
+                <DevopsConnectModal devops={record} />
+              </React.Fragment>
             );
           }}
         />

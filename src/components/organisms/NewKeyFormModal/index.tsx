@@ -37,7 +37,7 @@ export function NewKeyFormModal(
   const handleSaveNewKeyModal = React.useCallback(async () => {
     const {newKey} = await newKeyForm.validateFields();
     if (newKey) {
-      dispatch(editorSlice.actions.addNewKey(newKey));
+      dispatch(editorSlice.actions.addKey(newKey));
     }
     handleCloseNewKeyModal();
   }, [dispatch, handleCloseNewKeyModal, newKeyForm]);

@@ -13,6 +13,7 @@ import DefaultLayout from 'src/components/templates/DefaultLayout';
 import DevopsServers from 'src/modules/devops/DevopsServers';
 import FigmaConfigForm from 'src/modules/figma/FigmaConfigForm';
 import FigmaExporter from 'src/modules/figma/FigmaExporter';
+import 'src/config/sentry';
 
 const div = document.getElementById('root');
 const root = createRoot(div);

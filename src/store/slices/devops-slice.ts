@@ -11,9 +11,11 @@ export const devopsSlice = createSlice({
   name: 'devops',
   initialState,
   reducers: {
+    // load server list
     setServers(state, action: PayloadAction<DevopsServer[]>) {
       state.servers = action.payload;
     },
+    // To update or save a new server
     saveServer(state, action: PayloadAction<DevopsServer>) {
       const {id, name, url} = action.payload;
       const devopsServer: DevopsServer = DevopsServer.create();
@@ -27,6 +29,7 @@ export const devopsSlice = createSlice({
 
       state.servers = [...servers, devopsServer];
     },
+    // To delete a server from list
     deleteServer(state, action: PayloadAction<DevopsServer>) {
       const {id} = action.payload;
       state.servers = state.servers.filter((s) => s.id !== id);
