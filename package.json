@@ -1,10 +1,10 @@
 {
   "name": "l10n-editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "watch": "parcel watch manifest.json",
-    "build": "parcel build manifest.json --no-source-maps",
+    "build": "rm -rf dist .parcel-cache && parcel build manifest.json --no-source-maps",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

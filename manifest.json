@@ -1,6 +1,6 @@
 {
   "name": "Localization Editor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Localization editor for Flutter and React projects",
   "manifest_version": 3,
   "icons": {
@@ -18,8 +18,7 @@
   ],
   "host_permissions": [
     "https://devops.truesight.asia:8123/*",
-    "https://wegen.truesight.asia:8443/*",
-    "https://devops.*/*"
+    "https://wegen.truesight.asia:8443/*"
   ],
   "background": {
     "service_worker": "./src/index.background.ts",
