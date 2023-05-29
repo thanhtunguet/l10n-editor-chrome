@@ -31,12 +31,23 @@ import {store} from 'src/store';
 import {firstValueFrom} from 'rxjs';
 import {AzureDevopsRepository} from 'src/repositories/azure-devops-repository';
 import {captureException} from '@sentry/react';
+import Form from 'antd/lib/form';
+import Select from 'antd/lib/select';
 
 const Editor: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
 
   const locales = useSelector(
     (state: GlobalState) => state.editor.supportedLocales,
+  );
+
+  const [search, setSearch] = React.useState<string>('');
+
+  const handleSearch = React.useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearch(event.target.value);
+    },
+    [],
   );
 
   const isOnline: boolean = useSelector(
@@ -87,6 +98,7 @@ const Editor: FC = () => {
     if (Object.keys(localizationData).length === 0) {
       return [];
     }
+
     return [
       ...Object.keys(Object.values(localizationData)[0]).map((key) => ({
         dataIndex: key,
@@ -94,19 +106,22 @@ const Editor: FC = () => {
         title: key,
         render: (value, record) => {
           if (key !== 'key') {
+            const onChangeItem = (event) => {
+              dispatch(
+                editorSlice.actions.setNewKey({
+                  language: key,
+                  key: record.key,
+                  value: event.target.value,
+                }),
+              );
+            };
+
             return (
               <Input
-                value={value}
+                defaultValue={value}
                 disabled={value === key}
-                onChange={(event) => {
-                  dispatch(
-                    editorSlice.actions.setNewKey({
-                      language: key,
-                      key: record.key,
-                      value: event.target.value,
-                    }),
-                  );
-                }}
+                onPressEnter={onChangeItem}
+                onBlur={onChangeItem}
               />
             );
           }
@@ -136,10 +151,27 @@ const Editor: FC = () => {
     ];
   }, [dispatch, localizationData]);
 
-  const localizations = React.useMemo(
-    () => Object.values(localizationData),
-    [localizationData],
-  );
+  const localizations = React.useMemo(() => {
+    if (search) {
+      return Object.values(localizationData).filter((obj) =>
+        obj.key.startsWith(search),
+      );
+    }
+    return Object.values(localizationData);
+  }, [localizationData, search]);
+
+  const filterKeys = React.useMemo(() => {
+    const maps = {};
+    Object.entries(localizationData).forEach(([key]) => {
+      if (key.indexOf('.') > 0) {
+        const namespace = key.split('.')[0];
+        if (!maps.hasOwnProperty(namespace)) {
+          maps[namespace] = true;
+        }
+      }
+    });
+    return Object.keys(maps);
+  }, [localizationData]);
 
   const handleExportExcel = React.useCallback(() => {
     exportToLocalizationsExcel(localizationData);
@@ -242,50 +274,81 @@ const Editor: FC = () => {
   return (
     <>
       {contextHolder}
-      <Affix offsetTop={10}>
-        <div className="d-flex py-2 bg-white">
-          <Button
-            type="default"
-            className="d-flex align-items-center mr-2"
-            icon={<CloseOutlined />}
-            onClick={() => {
-              dispatch(editorSlice.actions.closeEditor());
-            }}>
-            Close editor
-          </Button>
-
-          <div className="d-inline-flex flex-grow-1 justify-content-end">
-            <TemplateButton />
-
-            <NewKeyFormModal icon={<PlusOutlined />}>Add key</NewKeyFormModal>
-
-            <ImportButton />
-
+      <Affix>
+        <div className="bg-white">
+          <div className="d-flex py-2 bg-white">
             <Button
-              type="primary"
-              className="d-flex align-items-center ml-2"
-              icon={<ExportOutlined />}
-              onClick={handleExportExcel}>
-              Export
+              type="default"
+              className="d-flex align-items-center mr-2"
+              icon={<CloseOutlined />}
+              onClick={() => {
+                dispatch(editorSlice.actions.closeEditor());
+              }}>
+              Close editor
             </Button>
 
-            <CodeModal
-              label="Code"
-              locales={locales}
-              localization={localizationData}
-              icon={<CodepenOutlined />}
-            />
+            <div className="d-inline-flex flex-grow-1 justify-content-end">
+              <TemplateButton />
 
-            {isOnline && (
+              <NewKeyFormModal icon={<PlusOutlined />}>Add key</NewKeyFormModal>
+
+              <ImportButton />
+
               <Button
                 type="primary"
                 className="d-flex align-items-center ml-2"
-                icon={<SaveOutlined />}
-                onClick={handleSaveToDevops}>
-                Save
+                icon={<ExportOutlined />}
+                onClick={handleExportExcel}>
+                Export
               </Button>
-            )}
+
+              <CodeModal
+                label="Code"
+                locales={locales}
+                localization={Object.fromEntries(
+                  localizations.map((obj) => [obj.key, obj]),
+                )}
+                icon={<CodepenOutlined />}
+              />
+
+              {isOnline && (
+                <Button
+                  type="primary"
+                  className="d-flex align-items-center ml-2"
+                  icon={<SaveOutlined />}
+                  onClick={handleSaveToDevops}>
+                  Save
+                </Button>
+              )}
+            </div>
           </div>
+          <Form className="p-4" wrapperCol={{span: 20}} labelCol={{span: 4}}>
+            {filterKeys.length === 0 && (
+              <Form.Item label="Search key">
+                <Input
+                  placeholder="Search key"
+                  value={search}
+                  onChange={handleSearch}
+                />
+              </Form.Item>
+            )}
+
+            <Form.Item label="Filter key">
+              <Select
+                placeholder="Filter key"
+                options={filterKeys.map((key) => ({
+                  label: key,
+                  value: key,
+                }))}
+                allowClear={true}
+                showSearch={true}
+                value={search ?? undefined}
+                onChange={(event) => {
+                  setSearch(event);
+                }}
+              />
+            </Form.Item>
+          </Form>
         </div>
       </Affix>
 

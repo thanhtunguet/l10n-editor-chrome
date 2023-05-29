@@ -1,10 +1,10 @@
 import {combineReducers, configureStore} from '@reduxjs/toolkit';
-import {editorSlice} from 'src/store/slices/editor-slice';
-import {persistReducer, persistStore} from 'redux-persist';
 import {createLogger} from 'redux-logger';
-import {devopsSlice} from 'src/store/slices/devops-slice';
+import {persistReducer, persistStore} from 'redux-persist';
 import type {PersistConfig} from 'redux-persist/es/types';
 import type {GlobalState} from 'src/store/GlobalState';
+import {devopsSlice} from 'src/store/slices/devops-slice';
+import {editorSlice} from 'src/store/slices/editor-slice';
 
 const chromeStorage: PersistConfig<any>['storage'] = {
   getItem: async (key: string) => {
@@ -27,16 +27,11 @@ const chromeStorage: PersistConfig<any>['storage'] = {
 const persistConfig: PersistConfig<GlobalState> = {
   key: 'root',
   storage: chromeStorage,
-};
-
-const editorPersistConfig: PersistConfig<GlobalState['editor']> = {
-  key: 'editor',
-  blacklist: ['supportedLocales', 'resources'],
-  storage: chromeStorage,
+  whitelist: ['devops'],
 };
 
 const rootReducer = combineReducers({
-  editor: persistReducer(editorPersistConfig, editorSlice.reducer),
+  editor: editorSlice.reducer,
   devops: devopsSlice.reducer,
 });
 
