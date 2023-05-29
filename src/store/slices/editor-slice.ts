@@ -1,12 +1,13 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
-import type {GlobalState} from 'src/store/GlobalState';
 import type {DevopsServer} from 'src/models/devops-server';
+import type {GlobalState} from 'src/store/GlobalState';
+import type {ProjectType} from 'src/types/ProjectType';
 
-const initialState: GlobalState['editor'] = {
+const initialState: GlobalState['editor'] = Object.freeze({
   supportedLocales: [],
   resources: {},
-};
+});
 
 export const editorSlice = createSlice({
   name: 'editor',
@@ -53,7 +54,7 @@ export const editorSlice = createSlice({
         devopsServer: DevopsServer;
         projectId: string;
         repositoryId: string;
-        projectType: 'flutter' | 'react';
+        projectType: ProjectType;
         resources: Record<string, Record<string, string>>;
         supportedLocales: string[];
       }>,
@@ -75,12 +76,9 @@ export const editorSlice = createSlice({
     },
 
     closeEditor(state, _action: PayloadAction<void>) {
-      state.resources = {};
-      state.supportedLocales = [];
-      state.devopsServer = null;
-      state.projectId = '';
-      state.repositoryId = '';
-      state.projectType = null;
+      Object.entries(state).forEach(([key]) => {
+        state[key] = initialState[key];
+      });
     },
   },
 });

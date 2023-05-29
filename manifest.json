@@ -1,6 +1,6 @@
 {
   "name": "Localization Editor",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Localization editor for Flutter and React projects",
   "manifest_version": 3,
   "icons": {
@@ -11,21 +11,20 @@
     "128": "src/assets/icons/128.png"
   },
   "permissions": [
+    "activeTab",
     "cookies",
     "storage",
-    "tabs",
-    "activeTab"
+    "tabs"
   ],
   "host_permissions": [
-    "https://devops.truesight.asia:8123/*",
-    "https://wegen.truesight.asia:8443/*"
+    "https://*/*"
   ],
   "background": {
     "service_worker": "./src/index.background.ts",
     "type": "module"
   },
   "options_ui": {
-    "page": "./src/modules/options/index.html",
+    "page": "./src/modules/options-page/index.html",
     "open_in_tab": true
   },
   "action": {}

@@ -1,8 +1,8 @@
+import type {AxiosRequestConfig} from 'axios';
 import {Model, ObjectList, Repository} from 'react3l';
-import {AzureProject, AzureRepo, GitObject} from 'src/models/azure-devops';
 import type {Observable} from 'rxjs';
 import {map} from 'rxjs';
-import type {AxiosRequestConfig, AxiosResponse} from 'axios';
+import {AzureProject, AzureRepo, GitObject} from 'src/models/azure-devops';
 import type {DevopsServer} from 'src/models/devops-server';
 
 class AzureProjectResponse extends Model {
@@ -21,14 +21,17 @@ class AzureGitObjectResponse extends Model {
 }
 
 export class AzureDevopsRepository extends Repository {
+  private requestInterceptorId: number;
+
   constructor(baseUrl: string) {
     super();
     this.baseURL = baseUrl;
-
-    this.http.interceptors.request.use(this.requestInterceptor);
+    this.requestInterceptorId = this.http.interceptors.request.use(
+      this.requestInterceptor,
+    );
   }
 
-  projects(): Observable<AzureProjectResponse> {
+  public readonly projects = (): Observable<AzureProjectResponse> => {
     return this.http
       .get('/_apis/projects')
       .pipe(
@@ -36,9 +39,11 @@ export class AzureDevopsRepository extends Repository {
           AzureProjectResponse,
         ),
       );
-  }
+  };
 
-  repositories(projectId: string): Observable<AzurerRepositoryResponse> {
+  public readonly repositories = (
+    projectId: string,
+  ): Observable<AzurerRepositoryResponse> => {
     return this.http
       .get(`/${projectId}/_apis/git/repositories`)
       .pipe(
@@ -46,7 +51,7 @@ export class AzureDevopsRepository extends Repository {
           AzurerRepositoryResponse,
         ),
       );
-  }
+  };
 
   gitObjects(
     projectId: string,
@@ -65,7 +70,7 @@ export class AzureDevopsRepository extends Repository {
       );
   }
 
-  read = async (
+  public readonly read = async (
     devopsServer: DevopsServer,
     projectId: string,
     repositoryId: string,
@@ -80,29 +85,31 @@ export class AzureDevopsRepository extends Repository {
     return response.json();
   };
 
-  private async requestInterceptor(
+  private readonly requestInterceptor = async (
     config: AxiosRequestConfig,
-  ): Promise<AxiosRequestConfig> {
+  ): Promise<AxiosRequestConfig> => {
     config.params = Object.assign(config.params ?? {}, {
       'api-version': '6.0-preview',
     });
     return config;
-  }
+  };
 
-  getLatestCommitId(repositoryId: string): Observable<string> {
+  public readonly getLatestCommitId = (
+    repositoryId: string,
+  ): Observable<string> => {
     return this.http.get(`/_apis/git/repositories/${repositoryId}/items`).pipe(
       Repository.responseMapToModel<AzureGitObjectResponse>(
         AzureGitObjectResponse,
       ),
       map((gitResponse) => gitResponse.value[0].commitId),
     );
-  }
+  };
 
-  updateFiles(
+  public readonly updateFiles = (
     repositoryId: string,
     latestCommitId: string,
     filesContents: Record<string, string>,
-  ): Observable<void> {
+  ): Observable<void> => {
     const changes = Object.entries(filesContents).map(([key, value]) => {
       return {
         changeType: 2,
@@ -131,5 +138,5 @@ export class AzureDevopsRepository extends Repository {
         ],
       })
       .pipe(Repository.responseDataMapper<void>());
-  }
+  };
 }

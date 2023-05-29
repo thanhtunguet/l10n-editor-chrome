@@ -1,13 +1,13 @@
-import React from 'react';
-import type {PropsWithChildren, ReactElement} from 'react';
-import Modal from 'antd/lib/modal/Modal';
+import {PlusOutlined} from '@ant-design/icons';
+import type {ButtonProps} from 'antd/lib/button';
+import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
-import type {ButtonProps} from 'antd/lib/button';
-import {PlusOutlined} from '@ant-design/icons';
-import Button from 'antd/lib/button';
-import {editorSlice} from 'src/store/slices/editor-slice';
+import Modal from 'antd/lib/modal/Modal';
+import type {PropsWithChildren, ReactElement} from 'react';
+import React from 'react';
 import {useDispatch} from 'react-redux';
+import {editorSlice} from 'src/store/slices/editor-slice';
 
 export function NewKeyFormModal(
   props: PropsWithChildren<NewKeyFormModalProps>,

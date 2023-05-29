@@ -1,4 +1,4 @@
 export enum ProjectType {
-  Flutter,
-  React,
+  Flutter = 'flutter',
+  React = 'react',
 }

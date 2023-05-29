@@ -2,9 +2,9 @@ import {combineReducers, configureStore} from '@reduxjs/toolkit';
 import {createLogger} from 'redux-logger';
 import {persistReducer, persistStore} from 'redux-persist';
 import type {PersistConfig} from 'redux-persist/es/types';
-import type {GlobalState} from 'src/store/GlobalState';
 import {devopsSlice} from 'src/store/slices/devops-slice';
 import {editorSlice} from 'src/store/slices/editor-slice';
+import {figmaSlice} from './slices/figma-slice';
 
 const chromeStorage: PersistConfig<any>['storage'] = {
   getItem: async (key: string) => {
@@ -24,18 +24,18 @@ const chromeStorage: PersistConfig<any>['storage'] = {
   },
 };
 
-const persistConfig: PersistConfig<GlobalState> = {
-  key: 'root',
-  storage: chromeStorage,
-  whitelist: ['devops'],
-};
-
-const rootReducer = combineReducers({
-  editor: editorSlice.reducer,
-  devops: devopsSlice.reducer,
-});
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const persistedReducer = persistReducer(
+  {
+    key: 'root',
+    storage: chromeStorage,
+    whitelist: ['devops'],
+  },
+  combineReducers({
+    editor: editorSlice.reducer,
+    devops: devopsSlice.reducer,
+    figma: figmaSlice.reducer,
+  }),
+);
 
 export const store = configureStore({
   reducer: persistedReducer,

@@ -1,5 +1,5 @@
-import {Field, Model, MomentField, ObjectField} from 'react3l';
 import type {Moment} from 'moment';
+import {Field, Model, MomentField, ObjectField} from 'react3l';
 
 export class AzureProject extends Model {
   @Field(String)

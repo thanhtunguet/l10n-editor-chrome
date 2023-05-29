@@ -1,4 +1,4 @@
 export enum ProjectLocation {
-  Online,
-  Offline,
+  Online = 'online',
+  Offline = 'offline',
 }

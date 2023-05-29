@@ -1,7 +1,7 @@
 import type {PayloadAction} from '@reduxjs/toolkit';
 import {createSlice} from '@reduxjs/toolkit';
-import type {GlobalState} from 'src/store/GlobalState';
 import {DevopsServer} from 'src/models/devops-server';
+import type {GlobalState} from 'src/store/GlobalState';
 
 const initialState: GlobalState['devops'] = {
   servers: [],

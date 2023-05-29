@@ -1,11 +1,11 @@
-import type {PropsWithChildren, ReactElement} from 'react';
-import React from 'react';
+import {ImportOutlined} from '@ant-design/icons';
 import type {ButtonProps} from 'antd/lib/button';
 import Button from 'antd/lib/button';
-import {ImportOutlined} from '@ant-design/icons';
-import * as XLSX from 'xlsx';
-import {editorSlice} from 'src/store/slices/editor-slice';
+import type {PropsWithChildren, ReactElement} from 'react';
+import React from 'react';
 import {useDispatch} from 'react-redux';
+import {editorSlice} from 'src/store/slices/editor-slice';
+import * as XLSX from 'xlsx';
 
 function readFileAsBase64(file) {
   return new Promise((resolve, reject) => {

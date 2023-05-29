@@ -1,30 +1,28 @@
-import type {FC} from 'react';
-import React from 'react';
-import Table from 'antd/lib/table';
-import {useDispatch, useSelector} from 'react-redux';
-import type {GlobalState} from 'src/store/GlobalState';
-import Button from 'antd/lib/button';
 import {
   DeleteOutlined,
   EditOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
 } from '@ant-design/icons';
-import Modal from 'antd/lib/modal';
+import Button from 'antd/lib/button';
 import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
-import type {DevopsServer} from 'src/models/devops-server';
-import {devopsSlice} from 'src/store/slices/devops-slice';
+import Modal from 'antd/lib/modal';
+import Table from 'antd/lib/table';
+import type {FC} from 'react';
+import React from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import DevopsConnectModal from 'src/components/organisms/DevopsConnectModal';
+import type {DevopsServer} from 'src/models/devops-server';
+import {serverSelector} from 'src/store/selectors';
+import {devopsSlice} from 'src/store/slices/devops-slice';
 
 const {Column} = Table;
 
-const DevopsServers: FC = () => {
+const DevopsPage: FC = () => {
   const dispatch = useDispatch();
 
-  const servers: DevopsServer[] = useSelector(
-    (state: GlobalState) => state.devops.servers,
-  );
+  const servers: DevopsServer[] = useSelector(serverSelector);
 
   const [modal, contextHolder] = Modal.useModal();
 
@@ -152,4 +150,6 @@ const DevopsServers: FC = () => {
   );
 };
 
-export default DevopsServers;
+DevopsPage.displayName = '/devops';
+
+export default DevopsPage;

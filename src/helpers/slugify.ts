@@ -1,4 +1,4 @@
-export function slugify(string) {
+export function vietnameseSlugify(string) {
   const a =
     'àáäâãåăæąçćčđďèéěėëêęğǵḧìíïîįłḿǹńňñòóöôœøṕŕřßşśšșťțùúüûǘůűūųẃẍÿýźžż·/_,:;';
   const b =

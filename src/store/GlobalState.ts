@@ -1,4 +1,5 @@
 import type {DevopsServer} from 'src/models/devops-server';
+import type {ProjectType} from 'src/types/ProjectType';
 
 export class GlobalState {
   editor: {
@@ -8,10 +9,14 @@ export class GlobalState {
     devopsServer?: DevopsServer;
     projectId?: string;
     repositoryId?: string;
-    projectType?: 'flutter' | 'react';
+    projectType?: ProjectType;
   };
 
   devops: {
     servers: DevopsServer[];
+  };
+
+  figma: {
+    apiKey?: string;
   };
 }

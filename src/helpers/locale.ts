@@ -1,5 +1,3 @@
-import local = chrome.storage.local;
-
 export function getLocaleFromFilename(filename: string): string {
   return filename.match(/([A-Za-z]{2})\.(arb|json)$/)[1];
 }

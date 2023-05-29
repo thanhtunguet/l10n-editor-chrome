@@ -8,7 +8,7 @@ export class FigmaRepository extends Repository {
   }
 
   // Main function to fetch all text nodes from the Figma file
-  async fetchAllTextNodes(fileKey: string) {
+  public async fetchAllTextNodes(fileKey: string) {
     const figmaApiKey = await this.getFigmaApiKey();
     const api = new Figma.Api({
       personalAccessToken: figmaApiKey,
@@ -20,7 +20,7 @@ export class FigmaRepository extends Repository {
     return textNodes;
   }
 
-  fetchAllNodes(
+  public fetchAllNodes(
     node: Figma.Node & {children?: Figma.Node[]},
     result: Figma.Node[],
   ) {

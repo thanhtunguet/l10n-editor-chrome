@@ -1,32 +1,34 @@
-import type {PropsWithChildren, ReactElement} from 'react';
-import React from 'react';
+import {ApiOutlined} from '@ant-design/icons';
+import {captureException} from '@sentry/react';
 import type {ButtonProps} from 'antd/lib/button';
 import Button from 'antd/lib/button';
-import {ApiOutlined} from '@ant-design/icons';
-import type {DevopsServer} from 'src/models/devops-server';
-import {useBoolean} from 'react3l';
-import Modal from 'antd/lib/modal';
 import Form from 'antd/lib/form';
-import Select from 'antd/lib/select';
-import {AzureDevopsRepository} from 'src/repositories/azure-devops-repository';
-import {captureException} from '@sentry/react';
-import type {AzureProject, AzureRepo, GitObject} from 'src/models/azure-devops';
-import {finalize, zip} from 'rxjs';
+import Modal from 'antd/lib/modal';
 import Radio from 'antd/lib/radio';
+import Select from 'antd/lib/select';
+import type {PropsWithChildren, ReactElement} from 'react';
+import React from 'react';
+import {useDispatch} from 'react-redux';
+import {useNavigate} from 'react-router-dom';
+import {useBoolean} from 'react3l';
+import {finalize, zip} from 'rxjs';
 import {
   getLocaleFromFilename,
   mapLocaleFilesToResources,
 } from 'src/helpers/locale';
-import {useDispatch} from 'react-redux';
+import type {AzureProject, AzureRepo, GitObject} from 'src/models/azure-devops';
+import type {DevopsServer} from 'src/models/devops-server';
+import EditorPage from 'src/modules/editor-page/EditorPage';
+import {AzureDevopsRepository} from 'src/repositories/azure-devops-repository';
 import {editorSlice} from 'src/store/slices/editor-slice';
-import {useNavigate} from 'react-router-dom';
+import {ProjectType} from 'src/types/ProjectType';
 
 export interface DevopsFormState {
   projectId: string;
 
   repositoryId: string;
 
-  projectType: 'flutter' | 'react';
+  projectType: ProjectType;
 }
 
 function captureError(error: Error) {
@@ -135,7 +137,7 @@ export function DevopsConnectModal(
     const {projectId, projectType, repositoryId} = form.getFieldsValue();
 
     const languageFiles = gitObjects.filter((obj) => {
-      if (projectType === 'flutter') {
+      if (projectType === ProjectType.Flutter) {
         return obj.path.startsWith('/lib/l10n/');
       }
       return obj.path.startsWith('/src/i18n/');
@@ -172,7 +174,7 @@ export function DevopsConnectModal(
               supportedLocales: locales,
             }),
           );
-          navigate('/');
+          navigate(EditorPage.displayName);
         },
         error: captureError,
       });

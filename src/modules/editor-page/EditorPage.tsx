@@ -6,40 +6,42 @@ import {
   PlusOutlined,
   SaveOutlined,
 } from '@ant-design/icons';
+import {captureException} from '@sentry/react';
 import Affix from 'antd/lib/affix';
 import Button from 'antd/lib/button';
+import Form from 'antd/lib/form';
 import Input from 'antd/lib/input';
+import notification from 'antd/lib/notification';
+import Select from 'antd/lib/select';
 import type {ColumnProps} from 'antd/lib/table';
 import Table from 'antd/lib/table';
 import type {FC} from 'react';
 import React from 'react';
 import {useDispatch, useSelector} from 'react-redux';
+import {firstValueFrom} from 'rxjs';
+import ImportButton from 'src/components/molecules/ImportButton';
 import TemplateButton from 'src/components/molecules/TemplateButton';
 import CodeModal from 'src/components/organisms/CodeModal';
-import ImportButton from 'src/components/molecules/ImportButton';
 import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
 import {exportToLocalizationsExcel} from 'src/helpers/excel';
-import type {GlobalState} from 'src/store/GlobalState';
-import {editorSlice} from 'src/store/slices/editor-slice';
-import notification from 'antd/lib/notification';
-import './Editor.scss';
 import {
   getLocaleFromFilename,
   mapLocaleFilesToResources,
 } from 'src/helpers/locale';
-import {store} from 'src/store';
-import {firstValueFrom} from 'rxjs';
 import {AzureDevopsRepository} from 'src/repositories/azure-devops-repository';
-import {captureException} from '@sentry/react';
-import Form from 'antd/lib/form';
-import Select from 'antd/lib/select';
+import {store} from 'src/store';
+import {
+  isOnlineSelector,
+  localeSelector,
+  resourceSelector,
+} from 'src/store/selectors';
+import {editorSlice} from 'src/store/slices/editor-slice';
+import './EditorPage.scss';
 
-const Editor: FC = () => {
+const EditorPage: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
 
-  const locales = useSelector(
-    (state: GlobalState) => state.editor.supportedLocales,
-  );
+  const locales = useSelector(localeSelector);
 
   const [search, setSearch] = React.useState<string>('');
 
@@ -50,13 +52,9 @@ const Editor: FC = () => {
     [],
   );
 
-  const isOnline: boolean = useSelector(
-    (state: GlobalState) => !!state.editor.devopsServer,
-  );
+  const isOnline: boolean = useSelector(isOnlineSelector);
 
-  const localizationData = useSelector(
-    (state: GlobalState) => state.editor.resources,
-  );
+  const localizationData = useSelector(resourceSelector);
 
   const dispatch = useDispatch();
 
@@ -333,21 +331,23 @@ const Editor: FC = () => {
               </Form.Item>
             )}
 
-            <Form.Item label="Filter key">
-              <Select
-                placeholder="Filter key"
-                options={filterKeys.map((key) => ({
-                  label: key,
-                  value: key,
-                }))}
-                allowClear={true}
-                showSearch={true}
-                value={search ?? undefined}
-                onChange={(event) => {
-                  setSearch(event);
-                }}
-              />
-            </Form.Item>
+            {filterKeys.length > 0 && (
+              <Form.Item label="Filter key">
+                <Select
+                  placeholder="Filter key"
+                  options={filterKeys.map((key) => ({
+                    label: key,
+                    value: key,
+                  }))}
+                  allowClear={true}
+                  showSearch={true}
+                  value={search ?? undefined}
+                  onChange={(event) => {
+                    setSearch(event);
+                  }}
+                />
+              </Form.Item>
+            )}
           </Form>
         </div>
       </Affix>
@@ -357,6 +357,6 @@ const Editor: FC = () => {
   );
 };
 
-Editor.displayName = 'Editor';
+EditorPage.displayName = '/editor';
 
-export default Editor;
+export default EditorPage;
