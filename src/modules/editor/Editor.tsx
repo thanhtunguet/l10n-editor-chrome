@@ -57,10 +57,14 @@ const Editor: FC = () => {
 
       for (let i = 0; i < selectedFileList.length; i++) {
         const file = selectedFileList[i];
-        const locale = getLocaleFromFilename(file.name);
-        languages.push(locale);
-        const text = await file.text();
-        localeObjects[locale] = JSON.parse(text);
+        try {
+          const locale = getLocaleFromFilename(file.name);
+          languages.push(locale);
+          const text = await file.text();
+          localeObjects[locale] = JSON.parse(text);
+        } catch (error) {
+          //
+        }
       }
 
       dispatch(
@@ -201,7 +205,6 @@ const Editor: FC = () => {
         },
         error: (error) => {
           captureException(error);
-          console.error(error);
           openNotification('Saving failed', 'Saving language files failed');
         },
       });
@@ -226,8 +229,6 @@ const Editor: FC = () => {
         <input
           id="import-files"
           type="file"
-          // @ts-ignore
-          webkitdirectory="webkitdirectory"
           className="hide"
           multiple={true}
           onChange={(event) => {

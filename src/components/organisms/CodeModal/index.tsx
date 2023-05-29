@@ -1,10 +1,10 @@
+import Button from 'antd/lib/button';
+import Modal from 'antd/lib/modal/Modal';
+import Typography from 'antd/lib/typography';
 import type {PropsWithChildren, ReactElement} from 'react';
 import React from 'react';
-import Typography from 'antd/lib/typography';
 import AceEditor from 'react-ace';
-import Modal from 'antd/lib/modal/Modal';
 import type {LocalizationMap} from 'src/types/Localization';
-import Button from 'antd/lib/button';
 
 function downloadFile(filename: string, content: string): void {
   const blob = new Blob([content], {type: 'text/plain'});

@@ -7,6 +7,27 @@ import * as XLSX from 'xlsx';
 import {editorSlice} from 'src/store/slices/editor-slice';
 import {useDispatch} from 'react-redux';
 
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        const base64String = reader.result.split(',')[1];
+        resolve(base64String);
+        return;
+      }
+      reject();
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Failed to read the file'));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 export function ImportButton(
   props: PropsWithChildren<ImportButtonProps>,
 ): ReactElement {
@@ -15,27 +36,6 @@ export function ImportButton(
 
   const handleImportExcel = React.useCallback(
     async (event) => {
-      function readFileAsBase64(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-
-          reader.onload = () => {
-            if (typeof reader.result === 'string') {
-              const base64String = reader.result.split(',')[1];
-              resolve(base64String);
-              return;
-            }
-            reject();
-          };
-
-          reader.onerror = () => {
-            reject(new Error('Failed to read the file'));
-          };
-
-          reader.readAsDataURL(file);
-        });
-      }
-
       if (event.target.files.length > 0) {
         const file = event.target.files[0];
         const base64 = await readFileAsBase64(file);
