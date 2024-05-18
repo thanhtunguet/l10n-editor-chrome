@@ -28,7 +28,7 @@ const persistedReducer = persistReducer(
   {
     key: 'root',
     storage: chromeStorage,
-    whitelist: ['devops'],
+    whitelist: ['devops', 'figma'],
   },
   combineReducers({
     editor: editorSlice.reducer,

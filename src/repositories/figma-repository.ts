@@ -1,9 +1,12 @@
 import * as Figma from 'figma-api';
 import {Repository} from 'react3l';
+import {store} from 'src/store';
+import type {GlobalState} from 'src/store/GlobalState';
 
 export class FigmaRepository extends Repository {
   async getFigmaApiKey(): Promise<string> {
-    const {figmaApiKey} = await chrome.storage.sync.get('figmaApiKey');
+    const globalState: GlobalState = store.getState();
+    const figmaApiKey = globalState.figma.apiKey;
     return figmaApiKey;
   }
 

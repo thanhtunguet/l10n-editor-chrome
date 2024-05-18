@@ -42,6 +42,8 @@ const FigmaPage: FC = () => {
 
   const apiKey = useSelector(figmaApiKeySelector);
 
+  console.log(apiKey);
+
   const [api, contextHolder] = notification.useNotification();
 
   const openNotification = React.useCallback(
@@ -60,9 +62,9 @@ const FigmaPage: FC = () => {
     async ({figmaLink}: FigmaLinkForm) => {
       try {
         setLoading(true);
-        const regex = /\/file\/([A-Za-z0-9-_]+)\//;
+        const regex = /\/(file|design)\/([A-Za-z0-9-_]+)\//;
         const matches = figmaLink.match(regex);
-        const fileKey = matches ? matches[1] : null;
+        const fileKey = matches ? matches[2] : null;
 
         const textNodes = await figmaRepository.fetchAllTextNodes(fileKey);
         const nodes: {
@@ -117,7 +119,7 @@ const FigmaPage: FC = () => {
     <Spin spinning={loading}>
       {contextHolder}
       <Form form={form} {...layout} onFinish={handleExport}>
-        <Form.Item label="Figma Link" name="figmaLink" initialValue="">
+        <Form.Item label="Figma Link" name="figmaLink" initialValue={apiKey}>
           <Input />
         </Form.Item>
 
