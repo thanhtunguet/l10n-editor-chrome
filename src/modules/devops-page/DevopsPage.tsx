@@ -36,7 +36,7 @@ const DevopsPage: FC = () => {
     });
   }, [form]);
 
-  const saveNewServer = React.useCallback(() => {
+  const handleSaveNewServer = React.useCallback(() => {
     const devopsServer = form.getFieldsValue();
     dispatch(devopsSlice.actions.saveServer(devopsServer));
     setIsModalVisible(false);
@@ -80,8 +80,7 @@ const DevopsPage: FC = () => {
         </Button>
       </div>
 
-      <Table dataSource={servers} showHeader={true} rowKey="id">
-        <Column key="ID" title="ID" dataIndex="id" />
+      <Table dataSource={servers} showHeader={true} rowKey="name">
         <Column key="Name" title="Name" dataIndex="name" />
         <Column
           key="URL"
@@ -129,11 +128,13 @@ const DevopsPage: FC = () => {
       <Modal
         open={isModalVisible}
         okText="Save"
-        onOk={saveNewServer}
+        onOk={handleSaveNewServer}
         onCancel={handleCloseModal}
         closable={true}
         destroyOnClose={true}>
         <Form layout="vertical" form={form}>
+          <Form.Item name="id" />
+
           <Form.Item label="Name" name="name" required={true}>
             <Input placeholder="Devops Server Name" allowClear={true} />
           </Form.Item>

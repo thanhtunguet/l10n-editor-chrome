@@ -37,6 +37,7 @@ import {
 } from 'src/store/selectors';
 import {editorSlice} from 'src/store/slices/editor-slice';
 import './EditorPage.scss';
+import classnames from 'classnames';
 
 const EditorPage: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
@@ -102,6 +103,9 @@ const EditorPage: FC = () => {
         dataIndex: key,
         key: key,
         title: key,
+        className: classnames({
+          'key-label': key === 'key',
+        }),
         render: (value, record) => {
           if (key !== 'key') {
             const onChangeItem = (event) => {

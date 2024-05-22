@@ -6,6 +6,7 @@ import theme from 'antd/lib/theme';
 import type {PropsWithChildren} from 'react';
 import React from 'react';
 import {Outlet, useLocation} from 'react-router-dom';
+import './DefaultLayout.scss';
 
 const {Header, Content, Footer} = Layout;
 
@@ -32,7 +33,7 @@ const DefaultLayout: React.FC<PropsWithChildren<{}>> = () => {
   const location = useLocation();
 
   return (
-    <Layout className="layout">
+    <Layout>
       <Header>
         <div className="logo" />
         <Menu
@@ -45,7 +46,7 @@ const DefaultLayout: React.FC<PropsWithChildren<{}>> = () => {
           }}
         />
       </Header>
-      <Content className="p-4 flex-grow-1 d-flex flex-column">
+      <Content>
         <Breadcrumb
           className="p-4"
           items={[

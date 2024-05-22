@@ -63,7 +63,11 @@ export function NewKeyFormModal(
         width={1000}>
         <Form form={newKeyForm}>
           <Form.Item label="New Key" name="newKey" required={true}>
-            <Input />
+            <Input
+              onPressEnter={() => {
+                handleSaveNewKeyModal();
+              }}
+            />
           </Form.Item>
         </Form>
       </Modal>

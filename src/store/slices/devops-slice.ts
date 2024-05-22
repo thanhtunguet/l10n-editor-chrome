@@ -18,14 +18,17 @@ export const devopsSlice = createSlice({
     // To update or save a new server
     saveServer(state, action: PayloadAction<DevopsServer>) {
       const {id, name, url} = action.payload;
+
       const devopsServer: DevopsServer = DevopsServer.create();
-      if (!id) {
+      if (!id || id === 0) {
         devopsServer.id = state.servers.length + 1;
       }
       devopsServer.name = name;
       devopsServer.url = url.replace(/\/$/, '');
 
-      const servers = state.servers.filter((s) => s.id !== id);
+      const servers = state.servers.filter(
+        (s) => s.id !== id || s.name !== name,
+      );
 
       state.servers = [...servers, devopsServer];
     },

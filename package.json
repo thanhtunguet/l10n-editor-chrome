@@ -1,21 +1,16 @@
 {
   "name": "l10n-editor",
-  "version": "1.2.2",
+  "version": "1.2.4",
   "private": true,
   "scripts": {
     "watch": "parcel watch manifest.json",
-    "build": "rm -rf dist .parcel-cache && parcel build manifest.json --no-source-maps",
+    "build": "parcel build manifest.json --no-source-maps",
+    "prebuild": "rm -rf dist .parcel-cache",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "alias": {
     "src": "./src"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -64,6 +59,7 @@
     "antd": "^5.4.7",
     "axios": "^0.21",
     "bootstrap": "~4",
+    "classnames": "^2.5.1",
     "codemirror": "^5",
     "figma-api": "^1.11.0",
     "i18next": "^22.4.15",
