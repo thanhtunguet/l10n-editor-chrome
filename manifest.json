@@ -1,6 +1,6 @@
 {
   "name": "Localization Editor",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Localization editor for Flutter and React projects",
   "manifest_version": 3,
   "icons": {

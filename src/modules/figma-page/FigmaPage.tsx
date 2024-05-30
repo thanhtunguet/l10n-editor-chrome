@@ -42,8 +42,6 @@ const FigmaPage: FC = () => {
 
   const apiKey = useSelector(figmaApiKeySelector);
 
-  console.log(apiKey);
-
   const [api, contextHolder] = notification.useNotification();
 
   const openNotification = React.useCallback(
@@ -119,8 +117,8 @@ const FigmaPage: FC = () => {
     <Spin spinning={loading}>
       {contextHolder}
       <Form form={form} {...layout} onFinish={handleExport}>
-        <Form.Item label="Figma Link" name="figmaLink" initialValue={apiKey}>
-          <Input />
+        <Form.Item label="Figma Link" name="figmaLink" initialValue="">
+          <Input placeholder="https://figma.com/design/..." />
         </Form.Item>
 
         <Form.Item

@@ -38,6 +38,7 @@ import {
 import {editorSlice} from 'src/store/slices/editor-slice';
 import './EditorPage.scss';
 import classnames from 'classnames';
+import {debug} from 'console';
 
 const EditorPage: FC = () => {
   const [files, setFiles] = React.useState<FileList | undefined>();
@@ -69,11 +70,23 @@ const EditorPage: FC = () => {
         const file = selectedFileList[i];
         try {
           const locale = getLocaleFromFilename(file.name);
-          languages.push(locale);
+
+          if (!languages.includes(locale)) {
+            languages.push(locale);
+          }
           const text = await file.text();
-          localeObjects[locale] = JSON.parse(text);
+          if (!localeObjects.hasOwnProperty(locale)) {
+            localeObjects[locale] = {};
+          }
+          const json = JSON.parse(text);
+          debugger;
+          localeObjects[locale] = {
+            ...localeObjects[locale],
+            ...json,
+          };
         } catch (error) {
-          //
+          console.error(error);
+          debugger;
         }
       }
 
@@ -356,7 +369,13 @@ const EditorPage: FC = () => {
         </div>
       </Affix>
 
-      <Table columns={columns} dataSource={localizations} pagination={false} />
+      <Table
+        columns={columns}
+        dataSource={localizations}
+        virtual={true}
+        scroll={{y: 600}}
+        pagination={false}
+      />
     </>
   );
 };

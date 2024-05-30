@@ -1,5 +1,5 @@
 export function getLocaleFromFilename(filename: string): string {
-  return filename.match(/([A-Za-z]{2})\.(arb|json)$/)[1];
+  return filename.match(/^.*_([A-Za-z]{2})\.(arb|json)$/)[1];
 }
 
 type LocaleKey = string;
