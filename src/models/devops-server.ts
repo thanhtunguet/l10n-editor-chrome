@@ -2,11 +2,11 @@ import {Field, Model} from 'react3l';
 
 export class DevopsServer extends Model {
   @Field(Number)
-  id: number;
+  id!: number;
 
   @Field(String)
-  name: string;
+  name!: string;
 
   @Field(String)
-  url: string;
+  url!: string;
 }

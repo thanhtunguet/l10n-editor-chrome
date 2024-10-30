@@ -1,0 +1,29 @@
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";
+@import "react-root";
+
+.ant-layout {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    .ant-layout-header {
+        background-color: transparent;
+        padding: 0 0;
+    }
+
+    .ant-layout-content {
+        padding: 0;
+        flex-grow: 1;
+        background-color: white;
+    }
+
+    .ant-layout-footer {
+        text-align: center;
+    }
+}
+
+.hide {
+    display: none;
+    visibility: hidden;
+}

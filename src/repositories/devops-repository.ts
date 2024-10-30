@@ -7,28 +7,33 @@ import type {DevopsServer} from 'src/models/devops-server';
 
 class AzureProjectResponse extends Model {
   @ObjectList(AzureProject)
-  value: AzureProject[];
+  value: AzureProject[] = [];
 }
 
 class AzurerRepositoryResponse extends Model {
   @ObjectList(AzureRepo)
-  value: AzureRepo[];
+  value: AzureRepo[] = [];
 }
 
 class AzureGitObjectResponse extends Model {
   @ObjectList(GitObject)
-  value: GitObject[];
+  value: GitObject[] = [];
 }
 
-export class AzureDevopsRepository extends Repository {
-  private requestInterceptorId: number;
+const requestInterceptor = async (
+  config: AxiosRequestConfig,
+): Promise<AxiosRequestConfig> => {
+  config.params = Object.assign(config.params ?? {}, {
+    'api-version': '6.0-preview',
+  });
+  return config;
+};
 
-  constructor(baseUrl: string) {
+export class AzureDevopsRepository extends Repository {
+  constructor(url: string) {
     super();
-    this.baseURL = baseUrl;
-    this.requestInterceptorId = this.http.interceptors.request.use(
-      this.requestInterceptor,
-    );
+    this.baseURL = url;
+    this.http.interceptors.request.use(requestInterceptor);
   }
 
   public readonly projects = (): Observable<AzureProjectResponse> => {
@@ -83,15 +88,6 @@ export class AzureDevopsRepository extends Repository {
       },
     );
     return response.json();
-  };
-
-  private readonly requestInterceptor = async (
-    config: AxiosRequestConfig,
-  ): Promise<AxiosRequestConfig> => {
-    config.params = Object.assign(config.params ?? {}, {
-      'api-version': '6.0-preview',
-    });
-    return config;
   };
 
   public readonly getLatestCommitId = (

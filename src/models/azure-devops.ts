@@ -21,7 +21,7 @@ export class AzureProject extends Model {
   visibility: string = '';
 
   @MomentField()
-  lastUpdateTime: Moment;
+  lastUpdateTime!: Moment;
 }
 
 export class AzureRepo extends Model {
@@ -35,7 +35,7 @@ export class AzureRepo extends Model {
   url: string = '';
 
   @ObjectField(AzureProject)
-  project: AzureProject;
+  project: AzureProject = new AzureProject();
 
   @Field(String)
   defaultBranch: string = '';
@@ -53,12 +53,17 @@ export class AzureRepo extends Model {
   webUrl: string = '';
 }
 
+export enum GitObjectType {
+  Blob = 'blob',
+  Tree = 'tree',
+}
+
 export class GitObject extends Model {
   @Field(String)
   objectId: string = '';
 
   @Field(String)
-  gitObjectType: string = 'blob'; // "blob", "tree"
+  gitObjectType: GitObjectType = GitObjectType.Blob;
 
   @Field(String)
   commitId: string = '';

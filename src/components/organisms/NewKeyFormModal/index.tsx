@@ -6,15 +6,11 @@ import Input from 'antd/lib/input';
 import Modal from 'antd/lib/modal/Modal';
 import type {PropsWithChildren, ReactElement} from 'react';
 import React from 'react';
-import {useDispatch} from 'react-redux';
-import {editorSlice} from 'src/store/slices/editor-slice';
 
 export function NewKeyFormModal(
   props: PropsWithChildren<NewKeyFormModalProps>,
 ): ReactElement {
-  const {children, ...restProps} = props;
-
-  const dispatch = useDispatch();
+  const {children, onCreate, ...restProps} = props;
 
   const [newKeyForm] = Form.useForm<{
     newKey: string;
@@ -37,17 +33,17 @@ export function NewKeyFormModal(
   const handleSaveNewKeyModal = React.useCallback(async () => {
     const {newKey} = await newKeyForm.validateFields();
     if (newKey) {
-      dispatch(editorSlice.actions.addKey(newKey));
+      onCreate(newKey);
     }
     handleCloseNewKeyModal();
-  }, [dispatch, handleCloseNewKeyModal, newKeyForm]);
+  }, [handleCloseNewKeyModal, newKeyForm, onCreate]);
 
   return (
     <>
       <Button
         {...restProps}
         type="primary"
-        className="d-flex align-items-center ml-2"
+        className="d-flex align-items-center mx-1"
         icon={<PlusOutlined />}
         onClick={handleOpenNewKeyModal}>
         {children}
@@ -76,12 +72,8 @@ export function NewKeyFormModal(
 }
 
 export interface NewKeyFormModalProps extends ButtonProps {
-  //
+  onCreate: (key: string) => void;
 }
-
-NewKeyFormModal.defaultProps = {
-  //
-};
 
 NewKeyFormModal.displayName = 'NewKeyFormModal';
 

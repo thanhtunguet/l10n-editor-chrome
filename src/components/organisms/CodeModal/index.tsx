@@ -1,10 +1,14 @@
+import 'ace-builds/src-noconflict/ace';
+import 'ace-builds/src-noconflict/ext-language_tools';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/theme-monokai';
 import Button from 'antd/lib/button';
 import Modal from 'antd/lib/modal/Modal';
 import Typography from 'antd/lib/typography';
 import type {PropsWithChildren, ReactElement} from 'react';
 import React from 'react';
 import AceEditor from 'react-ace';
-import type {LocalizationMap} from 'src/types/Localization';
+import type {LocalizationRecord} from 'src/models/localization-record';
 
 function downloadFile(filename: string, content: string): void {
   const blob = new Blob([content], {type: 'text/plain'});
@@ -24,7 +28,7 @@ function downloadFile(filename: string, content: string): void {
 export function CodeModal(
   props: PropsWithChildren<CodeModalProps>,
 ): ReactElement {
-  const {label, locales, localization, icon} = props;
+  const {label, supportedLocales: locales, localization, icon} = props;
 
   const [isCodeModalVisible, setIsCodeModalVisible] =
     React.useState<boolean>(false);
@@ -41,7 +45,7 @@ export function CodeModal(
     <>
       <Button
         type="primary"
-        className="d-flex align-items-center ml-2"
+        className="d-flex align-items-center mx-1"
         icon={icon}
         onClick={handleOpenCodeModal}>
         {label}
@@ -55,8 +59,8 @@ export function CodeModal(
           {isCodeModalVisible &&
             locales.map((locale) => {
               const result = Object.fromEntries(
-                Object.entries(localization).map(([key, value]) => [
-                  key,
+                Object.entries(localization).map(([, value]) => [
+                  value.key,
                   value[locale],
                 ]),
               );
@@ -103,18 +107,14 @@ export function CodeModal(
 }
 
 export interface CodeModalProps {
-  locales: string[];
+  supportedLocales: string[];
 
-  localization: LocalizationMap;
+  localization: LocalizationRecord[];
 
   label: string;
 
   icon?: ReactElement;
 }
-
-CodeModal.defaultProps = {
-  //
-};
 
 CodeModal.displayName = 'CodeModal';
 
