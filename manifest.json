@@ -1,6 +1,6 @@
 {
   "name": "Localization Editor",
-  "version": "1.2.5",
+  "version": "2.0.0",
   "description": "Localization editor for Flutter and React projects",
   "manifest_version": 3,
   "icons": {
@@ -33,8 +33,5 @@
       "64": "src/assets/icons/64.png",
       "128": "src/assets/icons/128.png"
     }
-  },
-  "content_security_policy": {
-    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' chrome-extension://lopojdmlaebikdabhahfandfbifhomko/; script-src-elem 'self'"
   }
 }

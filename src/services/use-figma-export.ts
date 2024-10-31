@@ -7,6 +7,8 @@ import type {LocalizationRecord} from 'src/models/localization-record';
 import {FigmaRepository} from 'src/repositories/figma-repository';
 import {LocalizationService} from './localization-service';
 
+const LANGUAGE_SEPARATOR = '//';
+
 export function useFigmaExport(): [boolean, FormProps['onFinish']] {
   const localizationService = React.useRef<LocalizationService>(
     new LocalizationService(),
@@ -42,12 +44,12 @@ export function useFigmaExport(): [boolean, FormProps['onFinish']] {
             .filter(({name}: Figma.Node<'TEXT'>) => {
               return (
                 !name.match(/^[0-9_]+$/) &&
-                name.toLowerCase().startsWith('label.')
+                name.toLowerCase().match(/^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)+$/)
               );
             })
             .map(({characters, name}): [string, LocalizationRecord] => {
-              const [vi, en] = characters.split('//');
-              return [name, {key: name, vi, en}];
+              const [vi, en] = characters.split(LANGUAGE_SEPARATOR);
+              return [name, {key: name, vi, en: en || vi}];
             }),
         );
         localizationService.exportToLocalizationsExcel(maps);
