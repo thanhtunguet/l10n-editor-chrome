@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - '*'
+    branches:
+      - main
 
 jobs:
   build:
@@ -16,7 +18,7 @@ jobs:
       - name: Build project
         run: |
           yarn install
-          yarn build-chrome
+          yarn build
           zip -r extension.zip dist
 
       - name: Upload Artifact
