@@ -5,6 +5,7 @@ import AppLayout from './components/AppLayout';
 import {AppRoute} from './config/routes';
 import EditorPage from './pages/EditorPage';
 import FigmaExportPage from './pages/FigmaExportPage';
+import SettingsForm from './components/SettingForms';
 
 const router = createHashRouter([
   {
@@ -18,6 +19,10 @@ const router = createHashRouter([
       {
         path: AppRoute.EDITOR,
         element: <EditorPage />,
+      },
+      {
+        path: AppRoute.HOME,
+        element: <SettingsForm />,
       },
     ],
   },

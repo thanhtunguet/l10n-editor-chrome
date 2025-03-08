@@ -3,6 +3,10 @@ import {AppRoute} from './routes';
 
 export const items: MenuItemType[] = [
   {
+    key: AppRoute.HOME,
+    label: 'Home',
+  },
+  {
     key: AppRoute.FIGMA_EXPORT,
     label: 'Figma',
   },

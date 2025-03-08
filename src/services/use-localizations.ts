@@ -6,6 +6,11 @@ export enum LocalizationActionType {
   PUT = 'PUT',
   PATCH = 'PATCH',
   CREATE = 'CREATE',
+  ADD_KEY = 'ADD_KEY',
+}
+
+function distinctStrings(value: string[]): string[] {
+  return Array.from(new Set(value));
 }
 
 type LocalizationAction = {
@@ -15,6 +20,7 @@ type LocalizationAction = {
     record?: LocalizationRecord;
     supportedLocales?: string[];
     resources?: LocalizationRecord[];
+    newLanguageKey?: string;
   };
 };
 
@@ -40,6 +46,24 @@ function localizationReducer(
         ...state,
       };
 
+    case LocalizationActionType.ADD_KEY:
+      const {newLanguageKey} = action.payload;
+
+      state.locales.forEach((locale) => {
+        if (!Object.prototype.hasOwnProperty.call(locale, newLanguageKey!)) {
+          locale[newLanguageKey!] = '';
+        }
+      });
+
+      const existed = state.supportedLocales.indexOf(newLanguageKey!) !== -1;
+      if (!existed) {
+        state.supportedLocales.push(newLanguageKey!);
+      }
+
+      return {
+        ...state,
+      };
+
     case LocalizationActionType.CREATE:
       return {
         ...state,
@@ -60,7 +84,13 @@ export function useLocalizations(): {
   ) => void;
   handleChange: (key: string, record: LocalizationRecord) => void;
   handleCreateNewKey: (key: string) => void;
+  handleAddLanguage: (newLanguageKey: string) => void;
+  searchableNamespaces: string[];
 } {
+  const [searchableNamespaces, setSearchableNamespaces] = React.useState<
+    string[]
+  >([]);
+
   const [{locales, supportedLocales}, dispatch] = React.useReducer<
     Reducer<LocalizationState, LocalizationAction>
   >(localizationReducer, {
@@ -95,11 +125,31 @@ export function useLocalizations(): {
     });
   }, []);
 
+  React.useEffect(() => {
+    if (locales) {
+      const namespaces = distinctStrings(
+        locales.map((record) => record.key.split('.')[0]),
+      );
+      setSearchableNamespaces(namespaces);
+    }
+  }, [locales]);
+
+  const handleAddLanguage = React.useCallback((newLanguageKey: string) => {
+    dispatch({
+      type: LocalizationActionType.ADD_KEY,
+      payload: {
+        newLanguageKey,
+      },
+    });
+  }, []);
+
   return {
     locales,
     supportedLocales,
     handlePutLocalizations,
     handleChange,
     handleCreateNewKey,
+    searchableNamespaces,
+    handleAddLanguage,
   };
 }

@@ -2,13 +2,15 @@ import {Button, Form, Input} from 'antd';
 import React from 'react';
 import type {ExtensionSettings} from 'src/models/extension-settings';
 
+export const EXTENSION_SETTINGS_KEY = 'extensionSettings';
+
 const SettingsForm = () => {
   const [form] = Form.useForm<ExtensionSettings>();
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    chrome.storage.sync.get('extensionSettings').then((result) => {
+    chrome.storage.sync.get(EXTENSION_SETTINGS_KEY).then((result) => {
       form.setFieldsValue(result.extensionSettings);
     });
   }, [form]);

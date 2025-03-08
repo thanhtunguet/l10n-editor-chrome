@@ -10,7 +10,7 @@ export default function ImportButton(
 ): ReactElement {
   const {children, onImport} = props;
 
-  const {handleImportExcel} = useLocalizationExcel(onImport);
+  const {handleImportFiles: handleImportExcel} = useLocalizationExcel(onImport);
 
   return (
     <>
@@ -29,6 +29,7 @@ export default function ImportButton(
         id="import-excel"
         onChange={handleImportExcel}
         className="hide"
+        multiple={true}
       />
     </>
   );
