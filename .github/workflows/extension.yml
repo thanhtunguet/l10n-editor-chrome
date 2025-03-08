@@ -2,7 +2,7 @@ name: Build and Publish Release
 on:
   push:
     tags:
-      - "*"
+      - '*'
 
 jobs:
   build:
@@ -16,11 +16,11 @@ jobs:
       - name: Build project
         run: |
           yarn install
-          yarn build
+          yarn build-chrome
           zip -r extension.zip dist
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: extension.zip
           path: extension.zip
