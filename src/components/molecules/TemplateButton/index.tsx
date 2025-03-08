@@ -16,7 +16,7 @@ export default function TemplateButton() {
         onClick={() => {
           document.getElementById('editor-template')?.click();
         }}>
-        Download template
+        Template
       </Button>
     </>
   );

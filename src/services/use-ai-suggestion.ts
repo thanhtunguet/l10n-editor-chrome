@@ -2,7 +2,6 @@ import OpenAI from 'openai';
 import React from 'react';
 import type {LocalizationRecord} from 'src/models/localization-record';
 import useOpenAISettings from './use-openai-settings';
-import {DEFAULT_PROMPT} from 'src/config/consts';
 
 function getUserPrompt(record: LocalizationRecord): string {
   const {key, ...restTranslations} = record;
@@ -41,6 +40,10 @@ export const useAiSuggestion = (): {
     });
   }, [apiKey, baseUrl]);
 
+  const {
+    settings: {systemPrompt},
+  } = useOpenAISettings();
+
   const handleGetAiSuggestion = React.useCallback(
     async (
       record: LocalizationRecord,
@@ -60,7 +63,7 @@ export const useAiSuggestion = (): {
           messages: [
             {
               role: 'system',
-              content: DEFAULT_PROMPT,
+              content: systemPrompt,
             },
             {
               role: 'user',
@@ -76,7 +79,7 @@ export const useAiSuggestion = (): {
 
       return {};
     },
-    [model],
+    [model, systemPrompt],
   );
 
   return {

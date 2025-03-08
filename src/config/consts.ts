@@ -1,3 +1,5 @@
+import type {OpenAISettings} from 'src/models/openai-settings';
+
 export const FIGMA_API_URL: string = 'https://api.figma.com/v1';
 
 export const countryCodeMap: Record<string, string> = {
@@ -49,7 +51,11 @@ export const countryCodeMap: Record<string, string> = {
   nz: 'New Zealand',
 };
 
-export const DEFAULT_PROMPT = `You are a developer experienced in multilingual systems and app localization.  
+export const OPENAI_DEFAULT_SETTINGS: OpenAISettings = {
+  baseUrl: 'https://api.openai.com/v1',
+  apiKey: '',
+  model: 'gpt-4-turbo',
+  systemPrompt: `You are a developer experienced in multilingual systems and app localization.  
 I will provide a localization key (in dot-separated camel case) and a translation in a source language.  
 I will also provide a list of missing locales (2-character locale codes).  
 
@@ -60,5 +66,5 @@ Your task is to translate the given text into the specified missing locales whil
 - Try to use the meaning of the **last word** in the localization key to guide the translation.  
 
 Respond **only** with a JSON object where the keys are the locale codes and the values are the translations.  
-Do not include explanations, comments, or any extra characters.
-`;
+Do not include explanations, comments, or any extra characters.`,
+};

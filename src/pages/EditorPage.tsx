@@ -1,8 +1,8 @@
 import {
   CodeOutlined,
+  DownloadOutlined,
   OpenAIOutlined,
   PlusOutlined,
-  SettingOutlined,
 } from '@ant-design/icons';
 import type {TableProps} from 'antd';
 import {Button, Form, Input, Modal, Select, Spin, Table} from 'antd';
@@ -12,11 +12,15 @@ import TemplateButton from 'src/components/molecules/TemplateButton';
 import CodeModal from 'src/components/organisms/CodeModal';
 import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
 import type {LocalizationRecord} from 'src/models/localization-record';
-import {useLocalizations} from 'src/services/use-localizations';
-import AITranslationModal from './AISupportModal';
+import {LocalizationService} from 'src/services/localization-service';
 import {useAiSuggestion} from 'src/services/use-ai-suggestion';
+import {useLocalizations} from 'src/services/use-localizations';
 
 export default function EditorPage() {
+  const localizationService = React.useRef<LocalizationService>(
+    new LocalizationService(),
+  ).current;
+
   const {
     locales,
     supportedLocales,
@@ -29,12 +33,6 @@ export default function EditorPage() {
 
   const [filteredNamespace, setFilteredNamespace] = React.useState<string>('');
   const [searchValue, setSearchValue] = React.useState<string>('');
-
-  const [aiModalVisible, setAiModalVisible] = React.useState<boolean>(false);
-
-  const handleCloseAiModal = React.useCallback(() => {
-    setAiModalVisible(false);
-  }, []);
 
   const {handleGetAiSuggestion} = useAiSuggestion();
 
@@ -89,8 +87,9 @@ export default function EditorPage() {
             allowClear={true}
             className="w-100 flex-grow-1"
             placeholder="Select namespace"
+            aria-placeholder="Select namespace"
             showSearch={true}
-            searchValue={searchValue}
+            searchValue={searchValue ?? ''}
             onSearch={(searchValue) => {
               setSearchValue(searchValue);
             }}
@@ -117,19 +116,23 @@ export default function EditorPage() {
             Import
           </ImportButton>
           <TemplateButton />
+
           <CodeModal
             label="Code"
             icon={<CodeOutlined />}
             supportedLocales={supportedLocales}
             localization={locales}
           />
+
           <Button
-            className="mx-1"
-            type="primary"
-            icon={<SettingOutlined />}
-            onClick={() => setAiModalVisible(true)}>
-            AI Settings
+            type="dashed"
+            icon={<DownloadOutlined />}
+            onClick={() =>
+              localizationService.generateAndDownloadLocalizationZip(locales)
+            }>
+            Download
           </Button>
+
           <Button
             className="mx-1"
             type="primary"
@@ -137,24 +140,20 @@ export default function EditorPage() {
             onClick={handleTranslateAll}>
             AI
           </Button>
+
           <Button
             className="mx-1"
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleOpenNewLanguageModal}>
-            Add Language
+            Locale
           </Button>
-          <NewKeyFormModal onCreate={handleCreateNewKey}>
-            Add key
-          </NewKeyFormModal>
+          <NewKeyFormModal onCreate={handleCreateNewKey}>Key</NewKeyFormModal>
         </div>
       </div>
       <Spin spinning={translating} tip={translateTitle}>
         <VirtualScrollTable
           virtual={true}
-          scroll={{
-            y: 800,
-          }}
           rowKey={(record) => record.key}
           dataSource={
             filteredNamespace
@@ -217,13 +216,7 @@ export default function EditorPage() {
           ]}
         />
       </Spin>
-      <AITranslationModal
-        languages={supportedLocales}
-        open={aiModalVisible}
-        onCloseModal={handleCloseAiModal}
-        onClose={handleCloseAiModal}
-        onCancel={handleCloseAiModal}
-      />
+
       <Modal
         title="Add new language"
         open={newLanguageVisible}

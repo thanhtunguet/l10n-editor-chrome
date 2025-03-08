@@ -32,5 +32,14 @@ module.exports = {
     ],
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/no-shadow': 'off',
+    '@typescript-eslint/explicit-member-accessibility': [
+      'error',
+      {
+        accessibility: 'explicit',
+        overrides: {
+          properties: 'no-public', // Ensures methods require `public`, but properties don't need it.
+        },
+      },
+    ],
   },
 };

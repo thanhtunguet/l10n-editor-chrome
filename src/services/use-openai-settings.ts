@@ -1,23 +1,15 @@
-import {useState, useEffect} from 'react';
-
-interface OpenAISettings {
-  baseUrl: string;
-  apiKey: string;
-  model: string;
-}
-
-const DEFAULT_SETTINGS: OpenAISettings = {
-  baseUrl: 'https://api.openai.com/v1',
-  apiKey: '',
-  model: 'gpt-4-turbo',
-};
+import React from 'react';
+import {OPENAI_DEFAULT_SETTINGS} from 'src/config/consts';
+import type {OpenAISettings} from 'src/models/openai-settings';
 
 const useOpenAISettings = () => {
-  const [settings, setSettings] = useState<OpenAISettings>(DEFAULT_SETTINGS);
-  const [loading, setLoading] = useState(true);
+  const [settings, setSettings] = React.useState<OpenAISettings>(
+    OPENAI_DEFAULT_SETTINGS,
+  );
+  const [loading, setLoading] = React.useState(true);
 
   // 📌 Load settings from Chrome storage
-  useEffect(() => {
+  React.useEffect(() => {
     chrome.storage.sync.get(['openAIConfig'], (result) => {
       if (result.openAIConfig) {
         setSettings(result.openAIConfig);
@@ -30,7 +22,7 @@ const useOpenAISettings = () => {
       [key: string]: chrome.storage.StorageChange;
     }) => {
       if (changes.openAIConfig) {
-        setSettings(changes.openAIConfig.newValue || DEFAULT_SETTINGS);
+        setSettings(changes.openAIConfig.newValue || OPENAI_DEFAULT_SETTINGS);
       }
     };
 

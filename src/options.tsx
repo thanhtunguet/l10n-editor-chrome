@@ -5,7 +5,8 @@ import AppLayout from './components/AppLayout';
 import {AppRoute} from './config/routes';
 import EditorPage from './pages/EditorPage';
 import FigmaExportPage from './pages/FigmaExportPage';
-import SettingsForm from './components/SettingForms';
+import HomePage from './pages/HomePage';
+import {AISettingsPage} from './pages/AISettingsPage';
 
 const router = createHashRouter([
   {
@@ -21,8 +22,12 @@ const router = createHashRouter([
         element: <EditorPage />,
       },
       {
+        path: AppRoute.AI_SETTINGS,
+        element: <AISettingsPage />,
+      },
+      {
         path: AppRoute.HOME,
-        element: <SettingsForm />,
+        element: <HomePage />,
       },
     ],
   },

@@ -7,6 +7,10 @@ export const items: MenuItemType[] = [
     label: 'Home',
   },
   {
+    key: AppRoute.AI_SETTINGS,
+    label: 'OpenAI Credentials',
+  },
+  {
     key: AppRoute.FIGMA_EXPORT,
     label: 'Figma',
   },

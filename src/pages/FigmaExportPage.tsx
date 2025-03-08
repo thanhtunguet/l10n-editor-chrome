@@ -14,6 +14,7 @@ const FigmaExportPage: React.FC = () => {
       <Form.Item
         label="Figma Link"
         name="figmaLink"
+        help="Enter Figma file link to export localizations"
         rules={[
           {required: true, message: 'Please enter the Figma file link'},
           {type: 'url', message: 'Please enter a valid URL'},
