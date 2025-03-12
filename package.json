@@ -1,6 +1,6 @@
 {
   "name": "l10n-editor",
-  "version": "2.1.3",
+  "version": "2.1.5",
   "private": true,
   "scripts": {
     "watch": "parcel watch manifest.json",

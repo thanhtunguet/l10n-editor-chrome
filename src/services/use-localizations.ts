@@ -7,6 +7,7 @@ export enum LocalizationActionType {
   PATCH = 'PATCH',
   CREATE = 'CREATE',
   ADD_KEY = 'ADD_KEY',
+  DELETE_KEY = 'DELETE_KEY',
 }
 
 function distinctStrings(value: string[]): string[] {
@@ -64,6 +65,15 @@ function localizationReducer(
         ...state,
       };
 
+    case LocalizationActionType.DELETE_KEY:
+      const {key} = action.payload;
+
+      state.locales = state.locales.filter((locale) => locale.key !== key);
+
+      return {
+        ...state,
+      };
+
     case LocalizationActionType.CREATE:
       return {
         ...state,
@@ -86,6 +96,7 @@ export function useLocalizations(): {
   handleCreateNewKey: (key: string) => void;
   handleAddLanguage: (newLanguageKey: string) => void;
   searchableNamespaces: string[];
+  handleDeleteKey: (key: string) => void;
 } {
   const [searchableNamespaces, setSearchableNamespaces] = React.useState<
     string[]
@@ -143,6 +154,15 @@ export function useLocalizations(): {
     });
   }, []);
 
+  const handleDeleteKey = React.useCallback((key: string) => {
+    dispatch({
+      type: LocalizationActionType.DELETE_KEY,
+      payload: {
+        key,
+      },
+    });
+  }, []);
+
   return {
     locales,
     supportedLocales,
@@ -151,5 +171,6 @@ export function useLocalizations(): {
     handleCreateNewKey,
     searchableNamespaces,
     handleAddLanguage,
+    handleDeleteKey,
   };
 }

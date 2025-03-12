@@ -5,7 +5,16 @@ import {
   PlusOutlined,
 } from '@ant-design/icons';
 import type {TableProps} from 'antd';
-import {Button, Form, Input, Modal, Select, Spin, Table} from 'antd';
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  notification,
+  Select,
+  Spin,
+  Table,
+} from 'antd';
 import React from 'react';
 import ImportButton from 'src/components/molecules/ImportButton';
 import TemplateButton from 'src/components/molecules/TemplateButton';
@@ -28,6 +37,7 @@ export default function EditorPage() {
     handleChange,
     handleCreateNewKey,
     handleAddLanguage,
+    handleDeleteKey,
     searchableNamespaces,
   } = useLocalizations();
 
@@ -79,31 +89,37 @@ export default function EditorPage() {
     setNewLanguageVisible(false);
   }, []);
 
+  const filteredLocales = filteredNamespace
+    ? locales.filter((locale) => locale.key.startsWith(filteredNamespace))
+    : locales;
+
+  const selectNamespaceComponent = locales.length > 0 && (
+    <Select
+      allowClear={true}
+      className="w-100 flex-grow-1"
+      placeholder="Select namespace"
+      aria-placeholder="Select namespace"
+      showSearch={true}
+      searchValue={searchValue ?? ''}
+      onSearch={(searchValue) => {
+        setSearchValue(searchValue);
+      }}
+      value={filteredNamespace}
+      onChange={(value) => {
+        setFilteredNamespace(value);
+      }}>
+      {searchableNamespaces.map((namespace) => (
+        <Select.Option key={namespace} value={namespace}>
+          {namespace}
+        </Select.Option>
+      ))}
+    </Select>
+  );
+
   return (
     <>
       <div className="d-flex justify-content-end my-4">
-        {locales.length > 0 && (
-          <Select
-            allowClear={true}
-            className="w-100 flex-grow-1"
-            placeholder="Select namespace"
-            aria-placeholder="Select namespace"
-            showSearch={true}
-            searchValue={searchValue ?? ''}
-            onSearch={(searchValue) => {
-              setSearchValue(searchValue);
-            }}
-            value={filteredNamespace}
-            onChange={(value) => {
-              setFilteredNamespace(value);
-            }}>
-            {searchableNamespaces.map((namespace) => (
-              <Select.Option key={namespace} value={namespace}>
-                {namespace}
-              </Select.Option>
-            ))}
-          </Select>
-        )}
+        {selectNamespaceComponent}
 
         <div className="d-inline-flex justify-content-end">
           <ImportButton
@@ -121,8 +137,9 @@ export default function EditorPage() {
             label="Code"
             icon={<CodeOutlined />}
             supportedLocales={supportedLocales}
-            localization={locales}
-          />
+            localization={filteredLocales}>
+            {selectNamespaceComponent}
+          </CodeModal>
 
           <Button
             type="dashed"
@@ -155,13 +172,7 @@ export default function EditorPage() {
         <VirtualScrollTable
           virtual={true}
           rowKey={(record) => record.key}
-          dataSource={
-            filteredNamespace
-              ? locales.filter((locale) =>
-                  locale.key.startsWith(filteredNamespace),
-                )
-              : locales
-          }
+          dataSource={filteredLocales}
           pagination={false}
           columns={[
             {
@@ -204,6 +215,16 @@ export default function EditorPage() {
                     </Button>
                     <Button
                       className="text-danger"
+                      onClick={() => {
+                        Modal.confirm({
+                          title: 'Delete this key',
+                          content: 'Confirm to delete this key?',
+                          okType: 'danger',
+                          onOk() {
+                            handleDeleteKey(key);
+                          },
+                        });
+                      }}
                       type="link"
                       htmlType="button"
                       id={`btn-edit-${key}`}>

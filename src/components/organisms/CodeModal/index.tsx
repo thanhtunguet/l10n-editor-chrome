@@ -2,6 +2,7 @@ import 'ace-builds/src-noconflict/ace';
 import 'ace-builds/src-noconflict/ext-language_tools';
 import 'ace-builds/src-noconflict/mode-json';
 import 'ace-builds/src-noconflict/theme-monokai';
+import {Col, Form, Row, Switch} from 'antd';
 import Button from 'antd/lib/button';
 import Modal from 'antd/lib/modal/Modal';
 import Typography from 'antd/lib/typography';
@@ -28,7 +29,15 @@ function downloadFile(filename: string, content: string): void {
 export function CodeModal(
   props: PropsWithChildren<CodeModalProps>,
 ): ReactElement {
-  const {label, supportedLocales: locales, localization, icon} = props;
+  const {
+    label,
+    supportedLocales: locales,
+    localization,
+    icon,
+    children,
+  } = props;
+
+  const [displayNamespace, setDisplayNamespace] = React.useState<boolean>(true);
 
   const [isCodeModalVisible, setIsCodeModalVisible] =
     React.useState<boolean>(false);
@@ -52,10 +61,36 @@ export function CodeModal(
       </Button>
       <Modal
         open={isCodeModalVisible}
-        width={locales.length * 500 + 100}
+        width={window.innerWidth - 100}
+        height={window.innerHeight - 80}
         closable={true}
-        onCancel={handleCloseCodeModal}>
-        <div className="d-flex p-2">
+        centered={true}
+        onCancel={handleCloseCodeModal}
+        onOk={handleCloseCodeModal}>
+        <Row>
+          <Col span={12}>
+            <Form.Item label="Namespace">{children}</Form.Item>
+          </Col>
+          <Col span={12}>
+            <Form.Item
+              label="Display namespace"
+              labelCol={{
+                span: 8,
+              }}
+              wrapperCol={{
+                span: 16,
+              }}>
+              <Switch
+                value={displayNamespace}
+                onChange={(value) => {
+                  setDisplayNamespace(value);
+                }}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
+
+        <div className="p-2 d-flex justify-content-start bg-white">
           {isCodeModalVisible &&
             locales.map((locale) => {
               const result = Object.fromEntries(
@@ -65,13 +100,24 @@ export function CodeModal(
                 ]),
               );
 
-              const content = JSON.stringify(result, null, 2);
+              const content = JSON.stringify(
+                Object.fromEntries(
+                  Object.entries(result).map(([key, value]) => [
+                    displayNamespace
+                      ? key
+                      : key.replace(/^[A-Za-z0-9]+\./gi, ''),
+                    value,
+                  ]),
+                ),
+                null,
+                2,
+              );
 
               return (
-                <div key={locale} className="d-flex flex-column">
+                <div key={locale} className="d-flex flex-column flex-grow-1">
                   <Typography.Title level={2}>{locale}</Typography.Title>
 
-                  <div>
+                  <div className="d-flex justify-content-between">
                     <Button
                       type="link"
                       onClick={() => {
@@ -91,12 +137,15 @@ export function CodeModal(
                     </Button>
                   </div>
 
-                  <AceEditor
-                    mode="json"
-                    theme="monokai"
-                    editorProps={{$blockScrolling: true}}
-                    value={content}
-                  />
+                  <div className="flex-grow-1">
+                    <AceEditor
+                      width="100%"
+                      mode="json"
+                      theme="monokai"
+                      editorProps={{$blockScrolling: true}}
+                      value={content}
+                    />
+                  </div>
                 </div>
               );
             })}
