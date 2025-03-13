@@ -14,7 +14,7 @@ export function AISettingsPage() {
   }, [settings, form]);
 
   // Handle form submission to save settings
-  const handleSave = async () => {
+  const handleSave = React.useCallback(async () => {
     try {
       const values = await form.validateFields();
       await setOpenAISettings(values); // Save settings to Chrome storage
@@ -26,7 +26,7 @@ export function AISettingsPage() {
       // eslint-disable-next-line no-console
       console.error('Validation failed:', error);
     }
-  };
+  }, [form, setOpenAISettings]);
 
   return (
     <Form form={form} layout="vertical" initialValues={OPENAI_DEFAULT_SETTINGS}>
@@ -36,15 +36,18 @@ export function AISettingsPage() {
         name="baseUrl">
         <Input placeholder="https://api.openai.com/v1" />
       </Form.Item>
+
       <Form.Item
         label="OpenAI API Key"
         help="You can find your API key in the OpenAI dashboard"
         name="apiKey">
         <Input.Password placeholder="OpenAI API Key" />
       </Form.Item>
+
       <Form.Item label="OpenAI Model" name="model" help="The model to use">
         <Input placeholder="Example: gpt-4-turbo, llama3.1, etc." />
       </Form.Item>
+
       <Form.Item
         label="System Prompt"
         name="systemPrompt"

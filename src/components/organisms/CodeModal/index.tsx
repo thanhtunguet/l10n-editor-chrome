@@ -26,6 +26,24 @@ function downloadFile(filename: string, content: string): void {
   URL.revokeObjectURL(anchorElement.href);
 }
 
+/**
+ * Sorts an object by its keys in ascending order.
+ *
+ * @param obj - The object to be sorted
+ * @returns A new object with sorted keys
+ */
+const sortObjectByKey = <T extends Record<string, any>>(obj: T): T => {
+  return Object.keys(obj)
+    .sort() // Sort keys alphabetically
+    .reduce((sortedObj, key) => {
+      sortedObj[key] = obj[key];
+      return sortedObj;
+    }, {} as T);
+};
+
+const compareFunction = ([key1]: [string, string], [key2]: [string, string]) =>
+  key1 > key2;
+
 export function CodeModal(
   props: PropsWithChildren<CodeModalProps>,
 ): ReactElement {
@@ -93,7 +111,7 @@ export function CodeModal(
         <div className="p-2 d-flex justify-content-start bg-white">
           {isCodeModalVisible &&
             locales.map((locale) => {
-              const result = Object.fromEntries(
+              const result: Record<string, string> = Object.fromEntries(
                 Object.entries(localization).map(([, value]) => [
                   value.key,
                   value[locale],
@@ -101,13 +119,17 @@ export function CodeModal(
               );
 
               const content = JSON.stringify(
-                Object.fromEntries(
-                  Object.entries(result).map(([key, value]) => [
-                    displayNamespace
-                      ? key
-                      : key.replace(/^[A-Za-z0-9]+\./gi, ''),
-                    value,
-                  ]),
+                sortObjectByKey(
+                  Object.fromEntries(
+                    Object.entries(result).map(
+                      ([key, value]: [string, string]): [string, string] => [
+                        displayNamespace
+                          ? key
+                          : key.replace(/^[A-Za-z0-9]+\./gi, ''),
+                        value,
+                      ],
+                    ),
+                  ),
                 ),
                 null,
                 2,

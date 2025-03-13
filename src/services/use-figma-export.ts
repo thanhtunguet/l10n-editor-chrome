@@ -23,7 +23,7 @@ export function useFigmaExport(): [boolean, FormProps['onFinish']] {
     chrome.storage.sync.get(
       'extensionSettings',
       ({extensionSettings}: {extensionSettings: ExtensionSettings}) => {
-        const figmaApiKey = extensionSettings.figmaApiKey;
+        const figmaApiKey = extensionSettings?.figmaApiKey;
         setFigmaRepository(new FigmaRepository(figmaApiKey));
       },
     );
