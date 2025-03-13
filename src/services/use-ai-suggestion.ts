@@ -58,23 +58,27 @@ export const useAiSuggestion = (): {
       });
 
       if (notTranslatedKeys.length) {
-        const completion = await openaiRef.current?.chat.completions.create({
-          model,
-          messages: [
-            {
-              role: 'system',
-              content: systemPrompt,
-            },
-            {
-              role: 'user',
-              content: getUserPrompt(record),
-            },
-          ],
-        });
-        const json: string | null | undefined =
-          completion?.choices[0].message.content;
+        try {
+          const completion = await openaiRef.current?.chat.completions.create({
+            model,
+            messages: [
+              {
+                role: 'system',
+                content: systemPrompt,
+              },
+              {
+                role: 'user',
+                content: getUserPrompt(record),
+              },
+            ],
+          });
+          const json: string | null | undefined =
+            completion?.choices[0].message.content;
 
-        return JSON.parse(json ?? '{}');
+          return JSON.parse(json ?? '{}');
+        } catch (error) {
+          return {};
+        }
       }
 
       return {};
