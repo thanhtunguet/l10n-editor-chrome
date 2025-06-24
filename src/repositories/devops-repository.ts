@@ -30,13 +30,13 @@ const requestInterceptor = async (
 };
 
 export class AzureDevopsRepository extends Repository {
-  constructor(url: string) {
+  public constructor(url: string) {
     super();
     this.baseURL = url;
     this.http.interceptors.request.use(requestInterceptor);
   }
 
-  public readonly projects = (): Observable<AzureProjectResponse> => {
+  readonly projects = (): Observable<AzureProjectResponse> => {
     return this.http
       .get('/_apis/projects')
       .pipe(
@@ -46,7 +46,7 @@ export class AzureDevopsRepository extends Repository {
       );
   };
 
-  public readonly repositories = (
+  readonly repositories = (
     projectId: string,
   ): Observable<AzurerRepositoryResponse> => {
     return this.http
@@ -58,10 +58,10 @@ export class AzureDevopsRepository extends Repository {
       );
   };
 
-  gitObjects(
+  readonly gitObjects = (
     projectId: string,
     repositoryId: string,
-  ): Observable<AzureGitObjectResponse> {
+  ): Observable<AzureGitObjectResponse> => {
     return this.http
       .get(`/${projectId}/_apis/git/repositories/${repositoryId}/items`, {
         params: {
@@ -73,9 +73,9 @@ export class AzureDevopsRepository extends Repository {
           AzureGitObjectResponse,
         ),
       );
-  }
+  };
 
-  public readonly read = async (
+  readonly read = async (
     devopsServer: DevopsServer,
     projectId: string,
     repositoryId: string,
@@ -90,9 +90,7 @@ export class AzureDevopsRepository extends Repository {
     return response.json();
   };
 
-  public readonly getLatestCommitId = (
-    repositoryId: string,
-  ): Observable<string> => {
+  readonly getLatestCommitId = (repositoryId: string): Observable<string> => {
     return this.http.get(`/_apis/git/repositories/${repositoryId}/items`).pipe(
       Repository.responseMapToModel<AzureGitObjectResponse>(
         AzureGitObjectResponse,
@@ -101,7 +99,7 @@ export class AzureDevopsRepository extends Repository {
     );
   };
 
-  public readonly updateFiles = (
+  readonly updateFiles = (
     repositoryId: string,
     latestCommitId: string,
     filesContents: Record<string, string>,

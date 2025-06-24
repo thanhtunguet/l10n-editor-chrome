@@ -3,7 +3,8 @@ import {Repository} from 'react3l';
 
 export class FigmaRepository extends Repository {
   private api: Figma.Api;
-  constructor(private apiKey: string) {
+
+  public constructor(private apiKey: string) {
     super();
     this.api = new Figma.Api({
       personalAccessToken: apiKey,
