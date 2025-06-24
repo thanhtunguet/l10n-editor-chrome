@@ -2,15 +2,16 @@ import {
   CodeOutlined,
   DownloadOutlined,
   OpenAIOutlined,
-  PlusOutlined,
 } from '@ant-design/icons';
 import type {TableProps} from 'antd';
-import {Button, Form, Input, Modal, Select, Spin, Table} from 'antd';
+import {Button, Input, Modal, Select, Spin, Table} from 'antd';
 import React from 'react';
 import ImportButton from 'src/components/molecules/ImportButton';
 import TemplateButton from 'src/components/molecules/TemplateButton';
 import CodeModal from 'src/components/organisms/CodeModal';
 import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
+import NewLocaleFormModal from 'src/components/organisms/NewLocaleFormModal';
+import {countryCodeMap} from 'src/config/consts';
 import type {LocalizationRecord} from 'src/models/localization-record';
 import {LocalizationService} from 'src/services/localization-service';
 import {useAiSuggestion} from 'src/services/use-ai-suggestion';
@@ -66,19 +67,6 @@ export default function EditorPage() {
       setTranslateTitle('');
     }
   }, [locales, handleTranslate]);
-
-  const [newLanguageVisible, setNewLanguageVisible] =
-    React.useState<boolean>(false);
-
-  const [newLanguageKey, setNewLanguageKey] = React.useState<string>('');
-
-  const handleOpenNewLanguageModal = React.useCallback(() => {
-    setNewLanguageVisible(true);
-  }, []);
-
-  const handleCloseNewLanguageModal = React.useCallback(() => {
-    setNewLanguageVisible(false);
-  }, []);
 
   const filteredLocales = filteredNamespace
     ? locales.filter((locale) => locale.key.startsWith(filteredNamespace))
@@ -149,13 +137,9 @@ export default function EditorPage() {
             AI
           </Button>
 
-          <Button
-            className="mx-1"
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={handleOpenNewLanguageModal}>
+          <NewLocaleFormModal onAddLanguage={handleAddLanguage}>
             Locale
-          </Button>
+          </NewLocaleFormModal>
           <NewKeyFormModal onCreate={handleCreateNewKey}>Key</NewKeyFormModal>
         </div>
       </div>
@@ -174,7 +158,11 @@ export default function EditorPage() {
             ...supportedLocales.map((lang) => ({
               key: lang,
               dataIndex: lang,
-              title: lang.toUpperCase(),
+              title: (
+                <>
+                  {lang.toUpperCase()} ({countryCodeMap[lang]})
+                </>
+              ),
               render(locale: string, record: LocalizationRecord) {
                 return (
                   <Input
@@ -228,28 +216,6 @@ export default function EditorPage() {
           ]}
         />
       </Spin>
-
-      <Modal
-        title="Add new language"
-        open={newLanguageVisible}
-        onClose={handleCloseNewLanguageModal}
-        onCancel={handleCloseNewLanguageModal}
-        onOk={() => {
-          handleAddLanguage(newLanguageKey);
-          handleCloseNewLanguageModal();
-        }}>
-        <Form>
-          <Form.Item label="Language Key">
-            <Input
-              maxLength={2}
-              placeholder="2-chars language key"
-              onChange={(event) => {
-                setNewLanguageKey(event.target.value);
-              }}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
     </>
   );
 }
