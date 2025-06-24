@@ -36,9 +36,9 @@ module.exports = {
       'error',
       {
         accessibility: 'explicit',
-        overrides: {
-          properties: 'no-public', // Ensures methods require `public`, but properties don't need it.
-        },
+        // overrides: {
+        //   properties: 'no-public', // Ensures methods require `public`, but properties don't need it.
+        // },
       },
     ],
   },

@@ -4,6 +4,7 @@ import type {MenuItemType} from 'antd/es/menu/interface';
 import React from 'react';
 import {Outlet, useLocation, useNavigate} from 'react-router-dom';
 import {items as menuItems} from 'src/config/menu';
+import { ErrorBoundary } from './ErrorBoundary';
 
 const {Header, Content, Footer} = Layout;
 
@@ -51,7 +52,9 @@ const AppLayout: React.FC = () => {
       <Content className="p-4">
         <Breadcrumb className="mb-4" items={breadcrumbItems} />
         <div className="bg-bg-container min-h-280 p-4 rounded-lg">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </div>
       </Content>
       <Footer className="text-center">

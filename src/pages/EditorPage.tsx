@@ -1,21 +1,14 @@
-import {
-  CodeOutlined,
-  DownloadOutlined,
-  OpenAIOutlined,
-} from '@ant-design/icons';
-import type {TableProps} from 'antd';
-import {Button, Input, Modal, Select, Spin, Table} from 'antd';
+import { Spin } from 'antd';
 import React from 'react';
-import ImportButton from 'src/components/molecules/ImportButton';
-import TemplateButton from 'src/components/molecules/TemplateButton';
-import CodeModal from 'src/components/organisms/CodeModal';
-import NewKeyFormModal from 'src/components/organisms/NewKeyFormModal';
-import NewLocaleFormModal from 'src/components/organisms/NewLocaleFormModal';
-import {countryCodeMap} from 'src/config/consts';
-import type {LocalizationRecord} from 'src/models/localization-record';
-import {LocalizationService} from 'src/services/localization-service';
-import {useAiSuggestion} from 'src/services/use-ai-suggestion';
-import {useLocalizations} from 'src/services/use-localizations';
+import EditorToolbar from '../components/molecules/EditorToolbar';
+import LocalizationTable from '../components/molecules/LocalizationTable';
+import { ErrorBoundary } from '../components/ErrorBoundary';
+import type { LocalizationRecord } from '../models/localization-record';
+import { LocalizationService } from '../services/localization-service';
+import { useAiSuggestion } from '../services/use-ai-suggestion';
+import { useLocalizations } from '../services/use-localizations';
+import { useEditorState, useFilteredLocalizations } from '../hooks/useEditorState';
+import { ErrorHandler } from '../types/errors';
 
 export default function EditorPage() {
   const localizationService = React.useRef<LocalizationService>(
@@ -33,221 +26,89 @@ export default function EditorPage() {
     searchableNamespaces,
   } = useLocalizations();
 
-  const [filteredNamespace, setFilteredNamespace] = React.useState<string>('');
-  const [searchValue, setSearchValue] = React.useState<string>('');
+  const {
+    filteredNamespace,
+    searchValue,
+    translating,
+    translateTitle,
+    setFilteredNamespace,
+    setSearchValue,
+    startTranslation,
+    finishTranslation,
+  } = useEditorState();
 
-  const {handleGetAiSuggestion} = useAiSuggestion();
+  const { handleGetAiSuggestion } = useAiSuggestion();
 
-  const [translating, setTranslating] = React.useState<boolean>(false);
-
-  const [translateTitle, setTranslateTitle] = React.useState<string>('');
+  const filteredLocales = useFilteredLocalizations(locales, filteredNamespace);
 
   const handleTranslate = React.useCallback(
-    async (record: LocalizationRecord) => {
-      const translation = await handleGetAiSuggestion(record);
-      Object.assign(record, translation);
-      handleChange(record.key, record);
+    async (record: LocalizationRecord): Promise<void> => {
+      try {
+        const translation = await handleGetAiSuggestion(record);
+        handleChange(record.key, translation);
+      } catch (error) {
+        ErrorHandler.log(ErrorHandler.normalize(error));
+        throw error;
+      }
     },
     [handleGetAiSuggestion, handleChange],
   );
 
   const handleTranslateAll = React.useCallback(async () => {
-    setTranslating(true);
-    setTranslateTitle('Translating');
+    startTranslation('Translating');
     try {
       for (const locale of locales) {
-        setTranslateTitle(`Translating ${locale.key}`);
+        startTranslation(`Translating ${locale.key}`);
         await handleTranslate(locale);
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
+      ErrorHandler.log(ErrorHandler.normalize(error));
     } finally {
-      setTranslating(false);
-      setTranslateTitle('');
+      finishTranslation();
     }
-  }, [locales, handleTranslate]);
+  }, [locales, handleTranslate, startTranslation, finishTranslation]);
 
-  const filteredLocales = filteredNamespace
-    ? locales.filter((locale) => locale.key.startsWith(filteredNamespace))
-    : locales;
-
-  const selectNamespaceComponent = locales.length > 0 && (
-    <Select
-      allowClear={true}
-      className="w-100 flex-grow-1"
-      placeholder="Select namespace"
-      aria-placeholder="Select namespace"
-      showSearch={true}
-      searchValue={searchValue ?? ''}
-      onSearch={(searchValue) => {
-        setSearchValue(searchValue);
-      }}
-      value={filteredNamespace}
-      onChange={(value) => {
-        setFilteredNamespace(value);
-      }}>
-      {searchableNamespaces.map((namespace) => (
-        <Select.Option key={namespace} value={namespace}>
-          {namespace}
-        </Select.Option>
-      ))}
-    </Select>
+  const handleDownload = React.useCallback(
+    async (localesToDownload: LocalizationRecord[]) => {
+      try {
+        await localizationService.generateAndDownloadLocalizationZip(localesToDownload);
+      } catch (error) {
+        ErrorHandler.log(ErrorHandler.normalize(error));
+      }
+    },
+    [localizationService],
   );
 
   return (
-    <>
-      <div className="d-flex justify-content-end my-4">
-        {selectNamespaceComponent}
-
-        <div className="d-inline-flex justify-content-end">
-          <ImportButton
-            onImport={(supportedLocales, resources) => {
-              handlePutLocalizations(
-                supportedLocales,
-                Object.values(resources),
-              );
-            }}>
-            Import
-          </ImportButton>
-          <TemplateButton />
-
-          <CodeModal
-            label="Code"
-            icon={<CodeOutlined />}
-            supportedLocales={supportedLocales}
-            localization={filteredLocales}>
-            {selectNamespaceComponent}
-          </CodeModal>
-
-          <Button
-            type="dashed"
-            icon={<DownloadOutlined />}
-            onClick={() =>
-              localizationService.generateAndDownloadLocalizationZip(locales)
-            }>
-            Download
-          </Button>
-
-          <Button
-            className="mx-1"
-            type="primary"
-            icon={<OpenAIOutlined />}
-            onClick={handleTranslateAll}>
-            AI
-          </Button>
-
-          <NewLocaleFormModal onAddLanguage={handleAddLanguage}>
-            Locale
-          </NewLocaleFormModal>
-          <NewKeyFormModal onCreate={handleCreateNewKey}>Key</NewKeyFormModal>
-        </div>
-      </div>
+    <ErrorBoundary>
+      <EditorToolbar
+        searchableNamespaces={searchableNamespaces}
+        filteredNamespace={filteredNamespace}
+        searchValue={searchValue}
+        supportedLocales={supportedLocales}
+        filteredLocales={filteredLocales}
+        allLocales={locales}
+        onNamespaceChange={setFilteredNamespace}
+        onSearchChange={setSearchValue}
+        onImport={(supportedLocales, resources) => {
+          handlePutLocalizations(supportedLocales, Object.values(resources));
+        }}
+        onDownload={handleDownload}
+        onAITranslateAll={handleTranslateAll}
+        onAddLanguage={handleAddLanguage}
+        onCreateNewKey={handleCreateNewKey}
+      />
+      
       <Spin spinning={translating} tip={translateTitle}>
-        <VirtualScrollTable
-          virtual={true}
-          rowKey={(record) => record.key}
+        <LocalizationTable
           dataSource={filteredLocales}
-          pagination={false}
-          columns={[
-            {
-              key: 'key',
-              dataIndex: 'key',
-              title: 'Key',
-            },
-            ...supportedLocales.map((lang) => ({
-              key: lang,
-              dataIndex: lang,
-              title: (
-                <>
-                  {lang.toUpperCase()} ({countryCodeMap[lang]})
-                </>
-              ),
-              render(locale: string, record: LocalizationRecord) {
-                return (
-                  <Input
-                    value={locale}
-                    onChange={(event) => {
-                      record[lang] = event.target.value;
-                      handleChange(record.key, record);
-                    }}
-                  />
-                );
-              },
-            })),
-            {
-              key: 'actions',
-              dataIndex: 'key',
-              title: 'Actions',
-              width: 180,
-              render(key: string, record: LocalizationRecord) {
-                return (
-                  <>
-                    <Button
-                      type="link"
-                      htmlType="button"
-                      id={`btn-edit-${key}`}
-                      onClick={async () => {
-                        await handleTranslate(record);
-                      }}>
-                      AI
-                    </Button>
-                    <Button
-                      className="text-danger"
-                      onClick={() => {
-                        Modal.confirm({
-                          title: 'Delete this key',
-                          content: 'Confirm to delete this key?',
-                          okType: 'danger',
-                          onOk() {
-                            handleDeleteKey(key);
-                          },
-                        });
-                      }}
-                      type="link"
-                      htmlType="button"
-                      id={`btn-edit-${key}`}>
-                      Delete
-                    </Button>
-                  </>
-                );
-              },
-            },
-          ]}
+          supportedLocales={supportedLocales}
+          onChange={handleChange}
+          onTranslate={handleTranslate}
+          onDeleteKey={handleDeleteKey}
+          loading={translating}
         />
       </Spin>
-    </>
-  );
-}
-
-function VirtualScrollTable<T>(props: TableProps<T>) {
-  const {columns, dataSource, ...restProps} = props;
-  const [tableHeight, setTableHeight] = React.useState<number>(400);
-
-  // Function to calculate available height
-  const updateTableHeight = () => {
-    const headerHeight = 64; // Navbar/Header height (adjust if needed)
-    const footerHeight = 0; // Footer height (adjust if needed)
-    const padding = 24 * 2 + (22 + 24) + (32 + 24 * 2) + 55; // Any additional padding
-    const availableHeight =
-      window.innerHeight - headerHeight - footerHeight - padding;
-    setTableHeight(availableHeight);
-  };
-
-  React.useEffect(() => {
-    updateTableHeight();
-    window.addEventListener('resize', updateTableHeight);
-    return () => window.removeEventListener('resize', updateTableHeight);
-  }, []);
-
-  return (
-    <Table
-      {...restProps}
-      columns={columns}
-      dataSource={dataSource}
-      scroll={{y: tableHeight}}
-      virtual={true} // Enable virtual scroll
-      pagination={false} // Optional: Remove pagination for better virtual scroll effect
-    />
+    </ErrorBoundary>
   );
 }

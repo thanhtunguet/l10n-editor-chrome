@@ -7,17 +7,17 @@ import type {DevopsServer} from 'src/models/devops-server';
 
 class AzureProjectResponse extends Model {
   @ObjectList(AzureProject)
-  value: AzureProject[] = [];
+  public value: AzureProject[] = [];
 }
 
 class AzurerRepositoryResponse extends Model {
   @ObjectList(AzureRepo)
-  value: AzureRepo[] = [];
+  public value: AzureRepo[] = [];
 }
 
 class AzureGitObjectResponse extends Model {
   @ObjectList(GitObject)
-  value: GitObject[] = [];
+  public value: GitObject[] = [];
 }
 
 const requestInterceptor = async (
@@ -36,7 +36,7 @@ export class AzureDevopsRepository extends Repository {
     this.http.interceptors.request.use(requestInterceptor);
   }
 
-  readonly projects = (): Observable<AzureProjectResponse> => {
+  public readonly projects = (): Observable<AzureProjectResponse> => {
     return this.http
       .get('/_apis/projects')
       .pipe(
@@ -46,7 +46,7 @@ export class AzureDevopsRepository extends Repository {
       );
   };
 
-  readonly repositories = (
+  public readonly repositories = (
     projectId: string,
   ): Observable<AzurerRepositoryResponse> => {
     return this.http
@@ -58,7 +58,7 @@ export class AzureDevopsRepository extends Repository {
       );
   };
 
-  readonly gitObjects = (
+  public readonly gitObjects = (
     projectId: string,
     repositoryId: string,
   ): Observable<AzureGitObjectResponse> => {
@@ -75,7 +75,7 @@ export class AzureDevopsRepository extends Repository {
       );
   };
 
-  readonly read = async (
+  public readonly read = async (
     devopsServer: DevopsServer,
     projectId: string,
     repositoryId: string,
@@ -90,7 +90,9 @@ export class AzureDevopsRepository extends Repository {
     return response.json();
   };
 
-  readonly getLatestCommitId = (repositoryId: string): Observable<string> => {
+  public readonly getLatestCommitId = (
+    repositoryId: string,
+  ): Observable<string> => {
     return this.http.get(`/_apis/git/repositories/${repositoryId}/items`).pipe(
       Repository.responseMapToModel<AzureGitObjectResponse>(
         AzureGitObjectResponse,
@@ -99,7 +101,7 @@ export class AzureDevopsRepository extends Repository {
     );
   };
 
-  readonly updateFiles = (
+  public readonly updateFiles = (
     repositoryId: string,
     latestCommitId: string,
     filesContents: Record<string, string>,

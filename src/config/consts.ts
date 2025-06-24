@@ -1,6 +1,8 @@
 import type {OpenAISettings} from 'src/models/openai-settings';
+import {FIGMA_API} from './api-constants';
+import {OPENAI_API} from './api-constants';
 
-export const FIGMA_API_URL: string = 'https://api.figma.com/v1';
+export const FIGMA_API_URL: string = FIGMA_API.BASE_URL;
 
 export const countryCodeMap: Record<string, string> = {
   vi: 'Vietnamese',
@@ -52,9 +54,9 @@ export const countryCodeMap: Record<string, string> = {
 };
 
 export const OPENAI_DEFAULT_SETTINGS: OpenAISettings = {
-  baseUrl: 'https://api.openai.com/v1',
+  baseUrl: OPENAI_API.BASE_URL,
   apiKey: '',
-  model: 'gpt-4-turbo',
+  model: OPENAI_API.DEFAULT_MODEL,
   systemPrompt: `You are a developer experienced in multilingual systems and app localization.  
 I will provide a localization key (in dot-separated camel case) and a translation in a source language.  
 I will also provide a list of missing locales (2-character locale codes).  
